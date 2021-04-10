@@ -22,11 +22,8 @@
 // import assert
 #include <cassert>
 
-// import socket, AF_INET
+// import socket, AF_INET, SOCK_STREAM
 #include <sys/socket.h>
-
-// import sockaddr_in, AF_INET, SOCK_STREAM, IPPROTO_TCP
-#include <netinet/in.h>
 
 // import inet_pton
 #include <arpa/inet.h>
@@ -80,7 +77,7 @@ int main(int argc, const char * argv[]) {
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = 0;
-    hints.ai_protocol = IPPROTO_TCP;
+    hints.ai_protocol = 0;
 
     int s = getaddrinfo(host.c_str(), "http", &hints, &result);
 
