@@ -21,7 +21,7 @@
 // import socket, AF_INET
 #include <sys/socket.h>
 
-// import sockaddr_in, PF_INET, SOCK_STREAM, IPPROTO_TCP
+// import sockaddr_in, AF_INET, SOCK_STREAM, IPPROTO_TCP
 #include <netinet/in.h>
 
 // import inet_pton
@@ -76,7 +76,7 @@ int main(int argc, const char * argv[]) {
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = 0;
-    hints.ai_protocol = 0;
+    hints.ai_protocol = IPPROTO_TCP;
 
     int s = getaddrinfo(host.c_str(), "http", &hints, &result);
 
