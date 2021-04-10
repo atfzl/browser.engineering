@@ -64,8 +64,8 @@ int main(int argc, const char * argv[]) {
             path.push_back(ch);
         }
     }
-    std::cout << host << std::endl;
-    std::cout << path << std::endl;
+    assert(host == "example.org");
+    assert(path == "index.html");
 
     // ----------
     
