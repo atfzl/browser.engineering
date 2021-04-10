@@ -3,6 +3,10 @@
 //  hello
 //
 //  Created by Atif Afzal on 4/9/21.
+//  references:
+//    https://browser.engineering/http.html
+//    https://www.man7.org/linux/man-pages/man3/getaddrinfo.3.html
+//    https://en.wikipedia.org/wiki/Berkeley_sockets
 //
 
 // namespace std
