@@ -46,7 +46,7 @@ bool startsWith(std::string s, std::string prefix) {
 struct request_response_type {
     std::string status;
     std::string headers;
-    std::string body;
+    std::string html;
 };
 
 request_response_type request(std::string url) {
@@ -139,9 +139,25 @@ request_response_type request(std::string url) {
     response_result.headers =
         response.substr(header_start, header_end - header_start);
 
-    response_result.body = response.substr(header_end + 4);
+    response_result.html = response.substr(header_end + 4);
 
     return response_result;
+}
+
+void display_html(std::string html) {
+    bool in_angle = false;
+
+    for (unsigned int i = 0; i < html.length(); ++i) {
+        char ch = html[i];
+        if (ch == '<') {
+            in_angle = true;
+        } else if (ch == '>') {
+            in_angle = false;
+        } else if (!in_angle) {
+            std::cout << ch;
+        }
+    }
+    std::cout << std::endl;
 }
 
 int main() {
@@ -149,9 +165,9 @@ int main() {
 
     request_response_type response = request(url);
 
-    std::cout << response.status << std::endl;
+    // std::cout << response.status << std::endl;
 
-    // std::cout << response << std::endl;
+    display_html(response.html);
 
     return EXIT_SUCCESS;
 }
