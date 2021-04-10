@@ -11,7 +11,9 @@
 
 // namespace std
 #include <iostream>
+#include <sstream>
 #include <string>
+#include <vector>
 
 // import perror
 #include <stdio.h>
@@ -41,7 +43,13 @@ bool startsWith(std::string s, std::string prefix) {
     return s.rfind(prefix, 0) == 0;
 }
 
-std::string request(std::string url) {
+struct request_response_type {
+    std::string status;
+    std::string headers;
+    std::string body;
+};
+
+request_response_type request(std::string url) {
     assert(startsWith(url, "http://"));
 
     // remove `http://` prefix
@@ -119,15 +127,31 @@ std::string request(std::string url) {
 
     close(SocketFD);
 
-    return response;
+    // ----------
+
+    request_response_type response_result;
+
+    unsigned int status_line_end = response.find("\r\n");
+    response_result.status = response.substr(0, status_line_end);
+
+    unsigned int header_start = status_line_end + 2;
+    unsigned int header_end = response.find("\r\n\r\n");
+    response_result.headers =
+        response.substr(header_start, header_end - header_start);
+
+    response_result.body = response.substr(header_end + 4);
+
+    return response_result;
 }
 
-int main(int argc, const char *argv[]) {
+int main() {
     std::string url = "http://example.org/index.html";
 
-    std::string response = request(url);
+    request_response_type response = request(url);
 
-    std::cout << response;
+    std::cout << response.status << std::endl;
+
+    // std::cout << response << std::endl;
 
     return EXIT_SUCCESS;
 }
