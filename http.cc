@@ -41,83 +41,91 @@ bool startsWith(std::string s, std::string prefix) {
     return s.rfind(prefix, 0) == 0;
 }
 
+std::string request(std::string url) {
+  assert(startsWith(url, "http://"));
+
+  // remove `http://` prefix
+  url = url.substr(7);
+
+  std::string host = "";
+  std::string path = "";
+  bool slashFound = false;
+  for (unsigned int i = 0; i < url.length(); ++i) {
+      char ch = url[i];
+      if (ch == '/') {
+          slashFound = true;
+          continue;
+      }
+      if (!slashFound) {
+          host.push_back(ch);
+      } else {
+          path.push_back(ch);
+      }
+  }
+  assert(host == "example.org");
+  assert(path == "index.html");
+
+  // ----------
+  
+  struct addrinfo hints;
+  struct addrinfo *result;
+
+  // clear memory
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_family = AF_INET;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags = 0;
+  hints.ai_protocol = 0;
+
+  int s = getaddrinfo(host.c_str(), "http", &hints, &result);
+
+  if (s != 0) {
+      fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
+      exit(EXIT_FAILURE);
+  }
+
+  int SocketFD;
+
+  SocketFD = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+  if (SocketFD == -1) {
+      perror("cannot create socket");
+      exit(EXIT_FAILURE);
+  }
+
+  if (connect(SocketFD, result->ai_addr, result->ai_addrlen) == -1) {
+      perror("cannot connect to socket");
+      exit(EXIT_FAILURE);
+  }
+
+  freeaddrinfo(result);
+
+  std::string message = "GET /index.html HTTP/1.0\r\nHost: example.org\r\n\r\n";
+
+  if (write(SocketFD, message.c_str(), message.length()) != message.length()) {
+      perror("failed write");
+      exit(EXIT_FAILURE);
+  }
+  
+  char buf[BUF_SIZE];
+  ssize_t nread = read(SocketFD, buf, BUF_SIZE);
+  if (nread == -1) {
+      perror("read");
+      exit(EXIT_FAILURE);
+  }
+
+  std::string response(buf, nread);
+
+  close(SocketFD);
+
+  return response;
+}
+
 int main(int argc, const char * argv[]) {
     std::string url = "http://example.org/index.html";
 
-    assert(startsWith(url, "http://"));
+    std::string response = request(url);
 
-    // remove `http://` prefix
-    url = url.substr(7);
-
-    std::string host = "";
-    std::string path = "";
-    bool slashFound = false;
-    for (unsigned int i = 0; i < url.length(); ++i) {
-        char ch = url[i];
-        if (ch == '/') {
-            slashFound = true;
-            continue;
-        }
-        if (!slashFound) {
-            host.push_back(ch);
-        } else {
-            path.push_back(ch);
-        }
-    }
-    assert(host == "example.org");
-    assert(path == "index.html");
-
-    // ----------
-    
-    struct addrinfo hints;
-    struct addrinfo *result;
-
-    // clear memory
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = 0;
-    hints.ai_protocol = 0;
-
-    int s = getaddrinfo(host.c_str(), "http", &hints, &result);
-
-    if (s != 0) {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
-        exit(EXIT_FAILURE);
-    }
-
-    int SocketFD;
-
-    SocketFD = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if (SocketFD == -1) {
-        perror("cannot create socket");
-        exit(EXIT_FAILURE);
-    }
-
-    if (connect(SocketFD, result->ai_addr, result->ai_addrlen) == -1) {
-        perror("cannot connect to socket");
-        exit(EXIT_FAILURE);
-    }
-
-    freeaddrinfo(result);
-
-    std::string message = "GET /index.html HTTP/1.0\r\nHost: example.org\r\n\r\n";
-
-    if (write(SocketFD, message.c_str(), message.length()) != message.length()) {
-        perror("failed write");
-        exit(EXIT_FAILURE);
-    }
-    
-    char buf[BUF_SIZE];
-    ssize_t nread = read(SocketFD, buf, BUF_SIZE);
-    if (nread == -1) {
-        perror("read");
-        exit(EXIT_FAILURE);
-    }
-
-    printf("Received %zd bytes: %s\n", nread, buf);    
-
-    close(SocketFD);
+    std::cout << response;
 
     return EXIT_SUCCESS;
 }
