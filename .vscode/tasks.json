@@ -1,10 +1,12 @@
 {
   "tasks": [
     {
-      "type": "cppbuild",
+      "type": "shell",
       "label": "C/C++: clang++ build active file",
       "command": "/usr/bin/clang++",
       "args": [
+        "-std=c++14",
+        "-stdlib=libc++",
         "-g",
         "${file}",
         "-o",
@@ -13,9 +15,7 @@
       "options": {
         "cwd": "${workspaceFolder}"
       },
-      "problemMatcher": [
-        "$gcc"
-      ],
+      "problemMatcher": ["$gcc"],
       "group": {
         "kind": "build",
         "isDefault": true
