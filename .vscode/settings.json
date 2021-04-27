@@ -1,9 +1,0 @@
-{
-  "editor.formatOnSave": true,
-  "files.associations": {
-    "iosfwd": "cpp",
-    "istream": "cpp",
-    "string": "cpp",
-    "iostream": "cpp"
-  }
-}

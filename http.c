@@ -94,6 +94,9 @@ void request(char* url, struct request_response_type** response) {
 
     int s = getaddrinfo(host, "http", &hints, &result);
 
+    free(host);
+    free(path);
+
     if (s != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
         exit(EXIT_FAILURE);
