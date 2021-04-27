@@ -73,8 +73,8 @@ void request(char* url, struct request_response_type** response) {
         path[pathIndex] = '\0';
     }
 
-    printf("%s %lu\n", host, strlen(host));
-    printf("%s %lu\n", path, strlen(path));
+    assert(strcmp(host, "example.org") == 0);
+    assert(strcmp(path, "index.html") == 0);
 }
 
 int main() {
