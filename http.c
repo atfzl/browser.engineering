@@ -56,8 +56,8 @@ void request(char* url, struct request_response_type** response) {
     trim_start(&url, "http://");
 
     // create array of max size because we don't have Vector right now
-    char* host = (char*)malloc(strlen(url) * sizeof(char));
-    char* path = (char*)malloc(strlen(url) * sizeof(char));
+    char* host = (char*)malloc((strlen(url) + 1) * sizeof(char));
+    char* path = (char*)malloc((strlen(url) + 1) * sizeof(char));
 
     {
         size_t hostIndex = 0;
