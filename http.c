@@ -56,8 +56,8 @@ void request(char* url, struct request_response_type* response) {
     trim_start(&url, "http://");
 
     // create array of max size because we don't have Vector right now
-    char* host = (char*)malloc((strlen(url) + 1) * sizeof(char));
-    char* path = (char*)malloc((strlen(url) + 1) * sizeof(char));
+    char* host = malloc((strlen(url) + 1) * sizeof(char));
+    char* path = malloc((strlen(url) + 1) * sizeof(char));
 
     {
         size_t hostIndex = 0;
@@ -138,7 +138,7 @@ void request(char* url, struct request_response_type* response) {
 
     char* first_newline = strstr(buf, "\r\n");
     size_t status_len = first_newline - buf;
-    response->status = (char*)malloc((status_len + 1) * sizeof(char));
+    response->status = malloc((status_len + 1) * sizeof(char));
     strncpy(response->status, buf, status_len);
     (response->status)[status_len] = '\0';
 
@@ -146,14 +146,14 @@ void request(char* url, struct request_response_type* response) {
 
     char* second_newline = strstr(first_newline, "\r\n\r\n");
     size_t headers_len = second_newline - first_newline;
-    response->headers = (char*)malloc((headers_len + 1) * sizeof(char));
+    response->headers = malloc((headers_len + 1) * sizeof(char));
     strncpy(response->headers, first_newline, headers_len);
     (response->headers)[headers_len] = '\0';
 
     second_newline += 4;  // skip \r\n\r\n
 
     size_t html_len = (buf + strlen(buf) - second_newline);
-    response->html = (char*)malloc((html_len + 1) * sizeof(char));
+    response->html = malloc((html_len + 1) * sizeof(char));
     strncpy(response->html, second_newline, html_len);
     (response->html)[html_len] = '\0';
 }
