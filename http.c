@@ -134,9 +134,28 @@ void request(char* url, struct request_response_type* response) {
 
     close(SocketFD);
 
-    response->status = "";
-    response->headers = "";
-    response->html = strdup(buf);
+    /* +1 during malloc is making space for \0 */
+
+    char* first_newline = strstr(buf, "\r\n");
+    size_t status_len = first_newline - buf;
+    response->status = (char*)malloc((status_len + 1) * sizeof(char));
+    strncpy(response->status, buf, status_len);
+    (response->status)[status_len] = '\0';
+
+    first_newline += 2;  // skip \r\n
+
+    char* second_newline = strstr(first_newline, "\r\n\r\n");
+    size_t headers_len = second_newline - first_newline;
+    response->headers = (char*)malloc((headers_len + 1) * sizeof(char));
+    strncpy(response->headers, first_newline, headers_len);
+    (response->headers)[headers_len] = '\0';
+
+    second_newline += 4;  // skip \r\n\r\n
+
+    size_t html_len = (buf + strlen(buf) - second_newline);
+    response->html = (char*)malloc((html_len + 1) * sizeof(char));
+    strncpy(response->html, second_newline, html_len);
+    (response->html)[html_len] = '\0';
 }
 
 int main() {
@@ -145,8 +164,12 @@ int main() {
 
     request(url, &response);
 
+    printf("%s\n", response.status);
+    printf("%s\n", response.headers);
     printf("%s\n", response.html);
 
+    free(response.status);
+    free(response.headers);
     free(response.html);
 
     return 0;
