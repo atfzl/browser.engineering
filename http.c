@@ -51,7 +51,7 @@ void trim_start(char** str, char* prefix) {
     }
 }
 
-void request(char* url, struct request_response_type** response) {
+void request(char* url, struct request_response_type* response) {
     assert(starts_with(url, "http://"));
     trim_start(&url, "http://");
 
@@ -134,14 +134,20 @@ void request(char* url, struct request_response_type** response) {
 
     close(SocketFD);
 
-    printf("%s", buf);
+    response->status = "";
+    response->headers = "";
+    response->html = strdup(buf);
 }
 
 int main() {
     char url[] = "http://example.org/index.html";
-    struct request_response_type* response;
+    struct request_response_type response;
 
     request(url, &response);
+
+    printf("%s\n", response.html);
+
+    free(response.html);
 
     return 0;
 }
