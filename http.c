@@ -1,7 +1,13 @@
+#include <arpa/inet.h>
 #include <assert.h>
+#include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+#define BUF_SIZE 2048
 
 struct request_response_type {
     char* status;
@@ -75,6 +81,57 @@ void request(char* url, struct request_response_type** response) {
 
     assert(strcmp(host, "example.org") == 0);
     assert(strcmp(path, "index.html") == 0);
+
+    struct addrinfo hints;
+    struct addrinfo* result;
+
+    // clear memory
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = 0;
+    hints.ai_protocol = 0;
+
+    int s = getaddrinfo(host, "http", &hints, &result);
+
+    if (s != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
+        exit(EXIT_FAILURE);
+    }
+
+    int SocketFD =
+        socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+
+    if (SocketFD == -1) {
+        perror("cannot create socket");
+        exit(EXIT_FAILURE);
+    }
+
+    if (connect(SocketFD, result->ai_addr, result->ai_addrlen) == -1) {
+        perror("cannot connect to socket");
+        exit(EXIT_FAILURE);
+    }
+
+    freeaddrinfo(result);
+
+    char message[] = "GET /index.html HTTP/1.0\r\nHost: example.org\r\n\r\n";
+
+    if (write(SocketFD, message, strlen(message)) != strlen(message)) {
+        perror("failed write");
+        exit(EXIT_FAILURE);
+    }
+
+    char buf[BUF_SIZE];
+    ssize_t nread = read(SocketFD, buf, BUF_SIZE);
+    if (nread == -1) {
+        perror("read");
+        exit(EXIT_FAILURE);
+    }
+    buf[nread] = '\0';
+
+    close(SocketFD);
+
+    printf("%s", buf);
 }
 
 int main() {
