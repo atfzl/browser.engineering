@@ -13,7 +13,10 @@
         "-I/usr/local/opt/openssl/include",
         "-L/usr/local/opt/openssl/lib",
         "-lssl",
-        "-lcrypto"
+        "-lcrypto",
+        "-I/usr/local/opt/sdl2/include",
+        "-L/usr/local/opt/sdl2/lib",
+        "-lSDL2"
       ],
       "options": {
         "cwd": "${workspaceFolder}"

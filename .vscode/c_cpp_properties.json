@@ -4,7 +4,8 @@
       "name": "Mac",
       "includePath": [
         "${workspaceFolder}/**",
-        "/usr/local/opt/openssl/include"
+        "/usr/local/opt/openssl/include",
+        "/usr/local/opt/sdl2/include"
       ],
       "defines": [],
       "macFrameworkPath": [
