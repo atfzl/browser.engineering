@@ -5,17 +5,20 @@
       "label": "C/C++: clang build active file",
       "command": "/usr/bin/clang",
       "args": [
+        "-std=c11",
         "-g",
         "${file}",
         "-o",
-        "${fileDirname}/${fileBasenameNoExtension}"
+        "${fileDirname}/${fileBasenameNoExtension}",
+        "-I/usr/local/opt/openssl/include",
+        "-L/usr/local/opt/openssl/lib",
+        "-lssl",
+        "-lcrypto"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
-      "problemMatcher": [
-        "$gcc"
-      ],
+      "problemMatcher": ["$gcc"],
       "group": {
         "kind": "build",
         "isDefault": true
