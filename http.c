@@ -1,6 +1,8 @@
 #include <arpa/inet.h>
 #include <assert.h>
 #include <netdb.h>
+#include <openssl/err.h>
+#include <openssl/ssl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -92,7 +94,7 @@ void request(char* url, struct request_response_type* response) {
     hints.ai_flags = 0;
     hints.ai_protocol = 0;
 
-    int s = getaddrinfo(host, "http", &hints, &result);
+    int s = getaddrinfo(host, "https", &hints, &result);
 
     free(host);
     free(path);
@@ -115,31 +117,68 @@ void request(char* url, struct request_response_type* response) {
         exit(EXIT_FAILURE);
     }
 
+    const SSL_METHOD* method =
+        TLS_client_method(); /* Create new client-method instance */
+    SSL_CTX* ctx = SSL_CTX_new(method);
+
+    if (ctx == NULL) {
+        ERR_print_errors_fp(stderr);
+        exit(EXIT_FAILURE);
+    }
+
+    SSL* ssl = SSL_new(ctx);
+    if (ssl == NULL) {
+        fprintf(stderr, "SSL_new() failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    SSL_set_fd(ssl, SocketFD);
+
+    const int status = SSL_connect(ssl);
+    if (status != 1) {
+        SSL_get_error(ssl, status);
+        ERR_print_errors_fp(
+            stderr);  // High probability this doesn't do anything
+        fprintf(stderr, "SSL_connect failed with SSL_get_error code %d\n",
+                status);
+        exit(EXIT_FAILURE);
+    }
+
     freeaddrinfo(result);
 
     char message[] = "GET /index.html HTTP/1.0\r\nHost: example.org\r\n\r\n";
 
-    if (write(SocketFD, message, strlen(message)) != strlen(message)) {
+    if (SSL_write(ssl, message, strlen(message)) != strlen(message)) {
         perror("failed write");
         exit(EXIT_FAILURE);
     }
 
-    char buf[BUF_SIZE];
-    ssize_t nread = read(SocketFD, buf, BUF_SIZE);
-    if (nread == -1) {
-        perror("read");
-        exit(EXIT_FAILURE);
-    }
-    buf[nread] = '\0';
+    // TODO dynamically allocate memory as needed
+    char total_response[BUF_SIZE * 10];
+    total_response[0] = '\0';
 
+    char buf[BUF_SIZE];
+
+    while (1) {
+        ssize_t nread = SSL_read(ssl, buf, BUF_SIZE);
+        if (nread == 0) {
+            break;
+        } else if (nread == -1) {
+            perror("read");
+            exit(EXIT_FAILURE);
+        }
+        strncat(total_response, buf, nread);
+    }
+
+    SSL_free(ssl);
     close(SocketFD);
+    SSL_CTX_free(ctx);
 
     /* +1 during malloc is making space for \0 */
-
-    char* first_newline = strstr(buf, "\r\n");
-    size_t status_len = first_newline - buf;
+    char* first_newline = strstr(total_response, "\r\n");
+    size_t status_len = first_newline - total_response;
     response->status = malloc((status_len + 1) * sizeof(char));
-    strncpy(response->status, buf, status_len);
+    strncpy(response->status, total_response, status_len);
     (response->status)[status_len] = '\0';
 
     first_newline += 2;  // skip \r\n
@@ -152,7 +191,8 @@ void request(char* url, struct request_response_type* response) {
 
     second_newline += 4;  // skip \r\n\r\n
 
-    size_t html_len = (buf + strlen(buf) - second_newline);
+    size_t html_len =
+        (total_response + strlen(total_response) - second_newline);
     response->html = malloc((html_len + 1) * sizeof(char));
     strncpy(response->html, second_newline, html_len);
     (response->html)[html_len] = '\0';
