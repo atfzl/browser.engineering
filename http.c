@@ -17,7 +17,7 @@ struct request_response_type {
     char* html;
 };
 
-int starts_with(char* str, char* prefix) {
+int starts_with(char* str, const char* prefix) {
     size_t len = strlen(str);
     size_t prefixLen = strlen(prefix);
 
@@ -38,7 +38,7 @@ int starts_with(char* str, char* prefix) {
     return 0;
 }
 
-void trim_start(char** str, char* prefix) {
+void trim_start(char** str, const char* prefix) {
     size_t len = strlen(*str);
     size_t prefixLen = strlen(prefix);
 
