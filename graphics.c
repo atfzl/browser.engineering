@@ -30,14 +30,6 @@ int main(int argc, char *argv[]) {
     // Initialize SDL2_ttf
     TTF_Init();
 
-#if defined linux && SDL_VERSION_ATLEAST(2, 0, 8)
-    // Disable compositor bypass
-    if (!SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0")) {
-        printf("SDL can not disable compositor bypass!\n");
-        return 0;
-    }
-#endif
-
     // Create window
     SDL_Window *window = SDL_CreateWindow(
         "SDL2_ttf sample", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
