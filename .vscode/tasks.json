@@ -16,7 +16,9 @@
         "-lcrypto",
         "-I/usr/local/opt/sdl2/include",
         "-L/usr/local/opt/sdl2/lib",
-        "-lSDL2"
+        "-lSDL2",
+        "-L/usr/local/opt/sdl2_ttf/lib",
+        "-lSDL2_ttf"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
