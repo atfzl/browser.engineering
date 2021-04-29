@@ -84,6 +84,10 @@ int main(int argc, char* argv[]) {
     // Event handler
     SDL_Event e;
 
+    SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
+
+    SDL_UpdateWindowSurface(gWindow);
+
     // While application is running
     while (!quit) {
         // Handle events on queue
@@ -93,13 +97,7 @@ int main(int argc, char* argv[]) {
                 quit = true;
             }
         }
-
-        SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
-
-        SDL_UpdateWindowSurface(gWindow);
     }
-
-    SDL_Delay(2000);
 
     close();
 
