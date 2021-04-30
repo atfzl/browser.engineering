@@ -3,6 +3,7 @@
 #include <netdb.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -198,15 +199,28 @@ void request(char* url, struct request_response_type* response) {
     (response->html)[html_len] = '\0';
 }
 
+void show(const char* html) {
+    bool in_angle = false;
+    size_t l = strlen(html);
+    for (size_t i = 0; i < l; ++i) {
+        char c = html[i];
+        if (c == '<') {
+            in_angle = true;
+        } else if (c == '>') {
+            in_angle = false;
+        } else if (!in_angle) {
+            putchar(c);
+        }
+    }
+}
+
 int main() {
     char url[] = "http://example.org/index.html";
     struct request_response_type response;
 
     request(url, &response);
 
-    printf("%s\n", response.status);
-    printf("%s\n", response.headers);
-    printf("%s\n", response.html);
+    show(response.html);
 
     free(response.status);
     free(response.headers);
