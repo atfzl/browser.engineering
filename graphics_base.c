@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -26,7 +27,7 @@ SDL_Surface* gKeyPressSurfaces[KEY_PRESS_SURFACE_TOTAL];
 SDL_Surface* gCurrentSurface = NULL;
 
 SDL_Surface* loadSurface(const char* path) {
-    SDL_Surface* loadedSurface = SDL_LoadBMP(path);
+    SDL_Surface* loadedSurface = IMG_Load(path);
     if (loadedSurface == NULL) {
         printf("Unable to load image %s! SDL Error: %s\n", path,
                SDL_GetError());
@@ -65,6 +66,13 @@ bool init() {
                    SDL_GetError());
             success = false;
         } else {
+            int imgFlags = IMG_INIT_PNG;
+            if (!(IMG_Init(imgFlags) & imgFlags)) {
+                printf("SDL_image could not initialize! SDL_image Error: %s\n",
+                       IMG_GetError());
+                success = false;
+            }
+
             // Get window surface
             gScreenSurface = SDL_GetWindowSurface(gWindow);
         }
@@ -79,7 +87,7 @@ bool loadMedia() {
 
     // Load default surface
     gKeyPressSurfaces[KEY_PRESS_SURFACE_DEFAULT] =
-        loadSurface("04_key_presses/press.bmp");
+        loadSurface("png_example.png");
     if (gKeyPressSurfaces[KEY_PRESS_SURFACE_DEFAULT] == NULL) {
         printf("Failed to load default image!\n");
         success = false;

@@ -19,7 +19,9 @@
         "-L/usr/local/opt/sdl2/lib",
         "-lSDL2",
         "-L/usr/local/opt/sdl2_ttf/lib",
-        "-lSDL2_ttf"
+        "-lSDL2_ttf",
+        "-L/usr/local/opt/sdl2_image/lib",
+        "-lSDL2_image"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
