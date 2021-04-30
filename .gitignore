@@ -1,5 +1,6 @@
 *
 !*.*
+!*/
 *.out
 *.dSYM
 .DS_Store
