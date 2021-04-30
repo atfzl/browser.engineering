@@ -11,16 +11,13 @@
         "${file}",
         "-o",
         "${fileDirname}/${fileBasenameNoExtension}",
+        // on mac, brew does not link openssl to /usr/local/lib and /usr/local/include
         "-I/usr/local/opt/openssl/include",
         "-L/usr/local/opt/openssl/lib",
         "-lssl",
         "-lcrypto",
-        "-I/usr/local/opt/sdl2/include",
-        "-L/usr/local/opt/sdl2/lib",
         "-lSDL2",
-        "-L/usr/local/opt/sdl2_ttf/lib",
         "-lSDL2_ttf",
-        "-L/usr/local/opt/sdl2_image/lib",
         "-lSDL2_image"
       ],
       "options": {
