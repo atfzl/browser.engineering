@@ -2,8 +2,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 800;
+const int SCREEN_HEIGHT = 600;
 
 enum KeyPressSurfaces {
     KEY_PRESS_SURFACE_DEFAULT,
@@ -33,7 +33,18 @@ SDL_Surface* loadSurface(const char* path) {
         return NULL;
     }
 
-    return loadedSurface;
+    SDL_Surface* optimizedSurface =
+        SDL_ConvertSurface(loadedSurface, gScreenSurface->format, 0);
+
+    if (optimizedSurface == NULL) {
+        printf("Unable to optimize image %s! SDL Error: %s\n", path,
+               SDL_GetError());
+        return NULL;
+    }
+
+    SDL_FreeSurface(loadedSurface);
+
+    return optimizedSurface;
 }
 
 bool init() {
@@ -142,7 +153,13 @@ int main(int argc, char* argv[]) {
     // Set default current surface
     gCurrentSurface = gKeyPressSurfaces[KEY_PRESS_SURFACE_DEFAULT];
 
-    SDL_BlitSurface(gCurrentSurface, NULL, gScreenSurface, NULL);
+    SDL_Rect stretchRect;
+    stretchRect.x = 0;
+    stretchRect.y = 0;
+    stretchRect.w = SCREEN_WIDTH;
+    stretchRect.h = SCREEN_HEIGHT;
+    SDL_BlitScaled(gCurrentSurface, NULL, gScreenSurface, &stretchRect);
+
     SDL_UpdateWindowSurface(gWindow);
 
     // While application is running
@@ -182,7 +199,8 @@ int main(int argc, char* argv[]) {
                             gKeyPressSurfaces[KEY_PRESS_SURFACE_DEFAULT];
                         break;
                 }
-                SDL_BlitSurface(gCurrentSurface, NULL, gScreenSurface, NULL);
+                SDL_BlitScaled(gCurrentSurface, NULL, gScreenSurface,
+                               &stretchRect);
                 SDL_UpdateWindowSurface(gWindow);
             }
         }
