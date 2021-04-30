@@ -14,10 +14,6 @@
 #define FONT_PATH "JetBrainsMono-Regular.ttf"
 
 int main(int argc, char *argv[]) {
-    // Unused argc, argv
-    (void)argc;
-    (void)argv;
-
     // Initialize SDL2
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf(
