@@ -3,11 +3,8 @@
 #include <string.h>
 
 void strcat_resize(char** s1, const char* s2) {
-    char* result = malloc(strlen(*s1) + strlen(s2) + 1);
-    strcpy(result, *s1);
-    strcat(result, s2);
-    free(*s1);
-    *s1 = result;
+    *s1 = realloc(*s1, strlen(*s1) + strlen(s2) + 1);
+    strcat(*s1, s2);
 }
 
 int main(int argc, char* argv[]) {
