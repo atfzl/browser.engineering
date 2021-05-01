@@ -199,9 +199,14 @@ void request(char* url, struct request_response_type* response) {
     (response->html)[html_len] = '\0';
 }
 
-void show(const char* html) {
+const char* lex(const char* html) {
     bool in_angle = false;
     size_t l = strlen(html);
+
+    char* text = malloc(9);
+    size_t text_max_size = 8;
+    size_t text_index = 0;
+
     for (size_t i = 0; i < l; ++i) {
         char c = html[i];
         if (c == '<') {
@@ -209,9 +214,15 @@ void show(const char* html) {
         } else if (c == '>') {
             in_angle = false;
         } else if (!in_angle) {
-            putchar(c);
+            if (text_index == text_max_size) {
+                text_max_size *= 2;
+                text = realloc(text, text_max_size + 1);
+            }
+            text[text_index++] = c;
         }
     }
+    text[++text_index] = '\0';
+    return text;
 }
 
 int main() {
@@ -220,7 +231,9 @@ int main() {
 
     request(url, &response);
 
-    show(response.html);
+    const char* x = lex(response.html);
+
+    printf("%s\n", x);
 
     free(response.status);
     free(response.headers);
