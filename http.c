@@ -55,8 +55,8 @@ void trim_start(char** str, const char* prefix) {
 }
 
 void request(char* url, struct request_response_type* response) {
-    assert(starts_with(url, "http://"));
-    trim_start(&url, "http://");
+    assert(starts_with(url, "https://"));
+    trim_start(&url, "https://");
 
     // create array of max size because we don't have Vector right now
     char* host = malloc((strlen(url) + 1) * sizeof(char));
@@ -226,7 +226,7 @@ const char* lex(const char* html) {
 }
 
 int main() {
-    char url[] = "http://example.org/index.html";
+    char url[] = "https://example.org/index.html";
     struct request_response_type response;
 
     request(url, &response);
