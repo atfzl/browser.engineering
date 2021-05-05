@@ -49,14 +49,15 @@ int main(int argc, char *argv[]) {
     }
     // Declare rect of square
     SDL_Rect squareRect;
+    {
+        // Square dimensions: Half of the min(SCREEN_WIDTH, SCREEN_HEIGHT)
+        squareRect.w = MIN(SCREEN_WIDTH, SCREEN_HEIGHT) / 2;
+        squareRect.h = MIN(SCREEN_WIDTH, SCREEN_HEIGHT) / 2;
 
-    // Square dimensions: Half of the min(SCREEN_WIDTH, SCREEN_HEIGHT)
-    squareRect.w = MIN(SCREEN_WIDTH, SCREEN_HEIGHT) / 2;
-    squareRect.h = MIN(SCREEN_WIDTH, SCREEN_HEIGHT) / 2;
-
-    // Square position: In the middle of the screen
-    squareRect.x = SCREEN_WIDTH / 2 - squareRect.w / 2;
-    squareRect.y = SCREEN_HEIGHT / 2 - squareRect.h / 2;
+        // Square position: In the middle of the screen
+        squareRect.x = SCREEN_WIDTH / 2 - squareRect.w / 2;
+        squareRect.y = SCREEN_HEIGHT / 2 - squareRect.h / 2;
+    }
 
     TTF_Font *font = TTF_OpenFont(FONT_PATH, 40);
     if (!font) {
@@ -69,8 +70,6 @@ int main(int argc, char *argv[]) {
 
     SDL_Color textColor = {0x00, 0x00, 0x00, 0xFF};
     SDL_Color textBackgroundColor = {0xFF, 0xFF, 0xFF, 0xFF};
-    SDL_Texture *text = NULL;
-    SDL_Rect textRect;
 
     SDL_Surface *textSurface = TTF_RenderText_Shaded(
         font, "Red square", textColor, textBackgroundColor);
@@ -83,7 +82,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Create texture from surface pixels
-    text = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_Texture *text = SDL_CreateTextureFromSurface(renderer, textSurface);
     if (!text) {
         printf(
             "Unable to create texture from rendered text!\n"
@@ -92,14 +91,16 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // Get text dimensions
-    textRect.w = textSurface->w;
-    textRect.h = textSurface->h;
+    SDL_Rect textRect;
+    {
+        // Get text dimensions
+        textRect.w = textSurface->w;
+        textRect.h = textSurface->h;
+        textRect.x = 0;
+        textRect.y = 0;
+    }
 
     SDL_FreeSurface(textSurface);
-
-    textRect.x = 0;
-    textRect.y = 0;
 
     // Event loop exit flag
     bool quit = false;
