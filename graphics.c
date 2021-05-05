@@ -13,18 +13,26 @@
 
 #define FONT_PATH "JetBrainsMono-Regular.ttf"
 
-int main(int argc, char *argv[]) {
+bool init() {
     // Initialize SDL2
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf(
             "SDL2 could not be initialized!\n"
             "SDL2 Error: %s\n",
             SDL_GetError());
-        return 1;
+        return false;
     }
 
     // Initialize SDL2_ttf
     TTF_Init();
+
+    return true;
+}
+
+int main(int argc, char *argv[]) {
+    if (!init()) {
+        return EXIT_FAILURE;
+    }
 
     // Create window
     SDL_Window *window = SDL_CreateWindow(
