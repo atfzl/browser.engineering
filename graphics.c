@@ -98,8 +98,8 @@ int main(int argc, char *argv[]) {
 
     SDL_FreeSurface(textSurface);
 
-    textRect.x = (SCREEN_WIDTH - textRect.w) / 2;
-    textRect.y = squareRect.y - textRect.h - 10;
+    textRect.x = 0;
+    textRect.y = 0;
 
     // Event loop exit flag
     bool quit = false;
@@ -124,9 +124,6 @@ int main(int argc, char *argv[]) {
 
         // Set renderer color red to draw the square
         SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
-
-        // Draw filled square
-        SDL_RenderFillRect(renderer, &squareRect);
 
         // Draw text
         SDL_RenderCopy(renderer, text, NULL, &textRect);
