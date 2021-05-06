@@ -40,9 +40,10 @@ bool init() {
     }
 
     // Create window
-    gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED,
-                               SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
-                               SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    gWindow =
+        SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED,
+                         SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT,
+                         SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
     if (gWindow == NULL) {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         return false;
@@ -113,6 +114,10 @@ int main(int argc, char* argv[]) {
     // Update screen
     SDL_RenderPresent(gRenderer);
 
+    int w;
+    int h;
+    SDL_GL_GetDrawableSize(gWindow, &w, &h);
+
     // While application is running
     while (!quit) {
         // Handle events on queue
@@ -127,27 +132,23 @@ int main(int argc, char* argv[]) {
             SDL_RenderClear(gRenderer);
 
             // Render red filled quad
-            SDL_Rect fillRect = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4,
-                                 SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
+            SDL_Rect fillRect = {w / 4, h / 4, w / 2, h / 2};
             SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
             SDL_RenderFillRect(gRenderer, &fillRect);
 
             // Render green outlined quad
-            SDL_Rect outlineRect = {SCREEN_WIDTH / 6, SCREEN_HEIGHT / 6,
-                                    SCREEN_WIDTH * 2 / 3,
-                                    SCREEN_HEIGHT * 2 / 3};
+            SDL_Rect outlineRect = {w / 6, h / 6, w * 2 / 3, h * 2 / 3};
             SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
             SDL_RenderDrawRect(gRenderer, &outlineRect);
 
             // Draw blue horizontal line
             SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF);
-            SDL_RenderDrawLine(gRenderer, 0, SCREEN_HEIGHT / 2, SCREEN_WIDTH,
-                               SCREEN_HEIGHT / 2);
+            SDL_RenderDrawLine(gRenderer, 0, h / 2, w, h / 2);
 
             // Draw vertical line of yellow dots
             SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0x00, 0xFF);
-            for (int i = 0; i < SCREEN_HEIGHT; i += 4) {
-                SDL_RenderDrawPoint(gRenderer, SCREEN_WIDTH / 2, i);
+            for (int i = 0; i < h; i += 4) {
+                SDL_RenderDrawPoint(gRenderer, w / 2, i);
             }
 
             SDL_RenderPresent(gRenderer);
