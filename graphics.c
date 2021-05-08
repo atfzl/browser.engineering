@@ -117,14 +117,7 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
 
-            SDL_Rect textRect;
-            {
-                // Get text dimensions
-                textRect.w = textSurface->w;
-                textRect.h = textSurface->h;
-                textRect.x = i * HSTEP;
-                textRect.y = 0;
-            }
+            SDL_Rect textRect = {i * HSTEP, 0, textSurface->w, textSurface->h};
 
             SDL_FreeSurface(textSurface);
 
