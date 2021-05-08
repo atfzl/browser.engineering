@@ -8,8 +8,8 @@
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 // Define screen dimensions
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+#define SCREEN_WIDTH_INITIAL 800
+#define SCREEN_HEIGHT_INITIAL 600
 
 #define FONT_PATH "JetBrainsMono-Regular.ttf"
 
@@ -35,10 +35,10 @@ int main(int argc, char *argv[]) {
     }
 
     // Create window
-    SDL_Window *window =
-        SDL_CreateWindow("SDL2_ttf sample", SDL_WINDOWPOS_UNDEFINED,
-                         SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT,
-                         SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
+    SDL_Window *window = SDL_CreateWindow(
+        "SDL2_ttf sample", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        SCREEN_WIDTH_INITIAL, SCREEN_HEIGHT_INITIAL,
+        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
     if (!window) {
         printf(
             "Window could not be created!\n"
@@ -69,7 +69,13 @@ int main(int argc, char *argv[]) {
     SDL_Color textColor = {0x00, 0x00, 0x00, 0xFF};
     SDL_Color textBackgroundColor = {0xFF, 0xFF, 0xFF, 0xFF};
 
-    const char t[] = "hello world";
+    const char t[] =
+        "hello world /usr/bin/clang -Wall -std=c11 -g "
+        "/Users/aafzal/scratch/browser.engineering/graphics.c -o "
+        "/Users/aafzal/scratch/browser.engineering/graphics -framework OpenGL "
+        "-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib -lssl "
+        "-lcrypto -lSDL2 -lSDL2_ttf -lSDL2_image -lglfw Build finished "
+        "successfully.";
 
     // Event loop
     while (true) {
@@ -89,7 +95,14 @@ int main(int argc, char *argv[]) {
         // Clear screen
         SDL_RenderClear(renderer);
 
-        const int HSTEP = 20;
+        int SCREEN_WIDTH;
+        int SCREEN_HEIGHT;
+        SDL_GL_GetDrawableSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
+
+        const int HSTEP = 24;
+        const int VSTEP = 48;
+        int cursor_x = HSTEP;
+        int cursor_y = VSTEP;
 
         for (size_t i = 0; i < strlen(t); ++i) {
             const char c[] = {t[i], '\0'};
@@ -117,7 +130,15 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
 
-            SDL_Rect textRect = {i * HSTEP, 0, textSurface->w, textSurface->h};
+            SDL_Rect textRect = {cursor_x, cursor_y, textSurface->w,
+                                 textSurface->h};
+
+            cursor_x += HSTEP;
+
+            if (cursor_x >= SCREEN_WIDTH - HSTEP) {
+                cursor_y += VSTEP;
+                cursor_x = HSTEP;
+            }
 
             SDL_FreeSurface(textSurface);
 
