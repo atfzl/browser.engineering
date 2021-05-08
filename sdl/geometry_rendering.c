@@ -153,6 +153,7 @@ int main(int argc, char* argv[]) {
 
             SDL_RenderPresent(gRenderer);
         }
+        SDL_Delay(15);
     }
 
     close();
