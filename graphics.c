@@ -68,36 +68,7 @@ int main(int argc, char *argv[]) {
     SDL_Color textColor = {0x00, 0x00, 0x00, 0xFF};
     SDL_Color textBackgroundColor = {0xFF, 0xFF, 0xFF, 0xFF};
 
-    SDL_Surface *textSurface = TTF_RenderText_Shaded(
-        font, "Red square", textColor, textBackgroundColor);
-    if (!textSurface) {
-        printf(
-            "Unable to render text surface!\n"
-            "SDL2_ttf Error: %s\n",
-            TTF_GetError());
-        return 1;
-    }
-
-    // Create texture from surface pixels
-    SDL_Texture *text = SDL_CreateTextureFromSurface(renderer, textSurface);
-    if (!text) {
-        printf(
-            "Unable to create texture from rendered text!\n"
-            "SDL2 Error: %s\n",
-            SDL_GetError());
-        return 1;
-    }
-
-    SDL_Rect textRect;
-    {
-        // Get text dimensions
-        textRect.w = textSurface->w;
-        textRect.h = textSurface->h;
-        textRect.x = 0;
-        textRect.y = 0;
-    }
-
-    SDL_FreeSurface(textSurface);
+    const char t[] = "hello world";
 
     // Event loop
     while (true) {
@@ -117,8 +88,48 @@ int main(int argc, char *argv[]) {
         // Clear screen
         SDL_RenderClear(renderer);
 
-        // Draw text
-        SDL_RenderCopy(renderer, text, NULL, &textRect);
+        const int HSTEP = 20;
+
+        for (size_t i = 0; i < strlen(t); ++i) {
+            const char c[] = {t[i], '\0'};
+            SDL_Surface *textSurface =
+                TTF_RenderText_Shaded(font, c, textColor, textBackgroundColor);
+            if (!textSurface) {
+                printf(
+                    "Unable to render text surface!\n"
+                    "SDL2_ttf Error: %s\n",
+                    TTF_GetError());
+                return 1;
+            }
+
+            SDL_SetColorKey(textSurface, SDL_TRUE,
+                            SDL_MapRGB(textSurface->format, 0xFF, 0xFF, 0xFF));
+
+            // Create texture from surface pixels
+            SDL_Texture *textTexture =
+                SDL_CreateTextureFromSurface(renderer, textSurface);
+            if (!textTexture) {
+                printf(
+                    "Unable to create texture from rendered text!\n"
+                    "SDL2 Error: %s\n",
+                    SDL_GetError());
+                return 1;
+            }
+
+            SDL_Rect textRect;
+            {
+                // Get text dimensions
+                textRect.w = textSurface->w;
+                textRect.h = textSurface->h;
+                textRect.x = i * HSTEP;
+                textRect.y = 0;
+            }
+
+            SDL_FreeSurface(textSurface);
+
+            // Draw text
+            SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+        }
 
         // Update screen
         SDL_RenderPresent(renderer);
