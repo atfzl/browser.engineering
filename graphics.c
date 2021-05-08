@@ -35,9 +35,10 @@ int main(int argc, char *argv[]) {
     }
 
     // Create window
-    SDL_Window *window = SDL_CreateWindow(
-        "SDL2_ttf sample", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    SDL_Window *window =
+        SDL_CreateWindow("SDL2_ttf sample", SDL_WINDOWPOS_UNDEFINED,
+                         SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT,
+                         SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
     if (!window) {
         printf(
             "Window could not be created!\n"
