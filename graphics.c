@@ -67,6 +67,20 @@ bool init(SDL_Window **window, SDL_Renderer **renderer, TTF_Font **font) {
     return true;
 }
 
+void cleanup(SDL_Window *window, SDL_Renderer *renderer) {
+    // Destroy renderer
+    SDL_DestroyRenderer(renderer);
+
+    // Destroy window
+    SDL_DestroyWindow(window);
+
+    // Quit SDL2_ttf
+    TTF_Quit();
+
+    // Quit SDL
+    SDL_Quit();
+}
+
 bool eventLoop(SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font,
                const char *message) {
     SDL_Color textColor = {0x00, 0x00, 0x00, 0xFF};
@@ -169,17 +183,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // Destroy renderer
-    SDL_DestroyRenderer(renderer);
-
-    // Destroy window
-    SDL_DestroyWindow(window);
-
-    // Quit SDL2_ttf
-    TTF_Quit();
-
-    // Quit SDL
-    SDL_Quit();
+    cleanup(window, renderer);
 
     return 0;
 }
