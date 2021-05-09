@@ -13,7 +13,7 @@
 
 #define FONT_PATH "JetBrainsMono-Regular.ttf"
 
-bool init() {
+bool init(SDL_Window **window, SDL_Renderer **renderer, TTF_Font **font) {
     // Initialize SDL2
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf(
@@ -31,6 +31,38 @@ bool init() {
             TTF_GetError());
         return false;
     }
+
+    // Create window
+    *window = SDL_CreateWindow("SDL2_ttf sample", SDL_WINDOWPOS_UNDEFINED,
+                               SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH_INITIAL,
+                               SCREEN_HEIGHT_INITIAL,
+                               SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
+    if (!*window) {
+        printf(
+            "Window could not be created!\n"
+            "SDL_Error: %s\n",
+            SDL_GetError());
+        return false;
+    }
+
+    // Create renderer
+    *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
+    if (!*renderer) {
+        printf(
+            "Renderer could not be created!\n"
+            "SDL_Error: %s\n",
+            SDL_GetError());
+        return false;
+    }
+
+    *font = TTF_OpenFont(FONT_PATH, 40);
+    if (!*font) {
+        printf(
+            "Unable to load font: '%s'!\n"
+            "SDL2_ttf Error: %s\n",
+            FONT_PATH, TTF_GetError());
+        return false;
+    };
 
     return true;
 }
@@ -104,41 +136,12 @@ bool eventLoop(SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font,
 }
 
 int main(int argc, char *argv[]) {
-    if (!init()) {
+    SDL_Window *window = NULL;
+    SDL_Renderer *renderer = NULL;
+    TTF_Font *font = NULL;
+
+    if (!init(&window, &renderer, &font)) {
         return EXIT_FAILURE;
-    }
-
-    // Create window
-    SDL_Window *window = SDL_CreateWindow(
-        "SDL2_ttf sample", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        SCREEN_WIDTH_INITIAL, SCREEN_HEIGHT_INITIAL,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
-    if (!window) {
-        printf(
-            "Window could not be created!\n"
-            "SDL_Error: %s\n",
-            SDL_GetError());
-        return 1;
-    }
-
-    // Create renderer
-    SDL_Renderer *renderer =
-        SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (!renderer) {
-        printf(
-            "Renderer could not be created!\n"
-            "SDL_Error: %s\n",
-            SDL_GetError());
-        return 1;
-    }
-
-    TTF_Font *font = TTF_OpenFont(FONT_PATH, 40);
-    if (!font) {
-        printf(
-            "Unable to load font: '%s'!\n"
-            "SDL2_ttf Error: %s\n",
-            FONT_PATH, TTF_GetError());
-        return 1;
     }
 
     const char message[] =
@@ -162,7 +165,7 @@ int main(int argc, char *argv[]) {
         }
 
         if (!eventLoop(renderer, window, font, message)) {
-            return 1;
+            return EXIT_FAILURE;
         }
     }
 
