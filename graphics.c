@@ -24,7 +24,13 @@ bool init() {
     }
 
     // Initialize SDL2_ttf
-    TTF_Init();
+    if (TTF_Init() < 0) {
+        printf(
+            "SDL2_ttf could not be initialized!\n"
+            "SDL2_ttf Error: %s\n",
+            TTF_GetError());
+        return false;
+    }
 
     return true;
 }
@@ -55,6 +61,7 @@ int main(int argc, char *argv[]) {
             "Renderer could not be created!\n"
             "SDL_Error: %s\n",
             SDL_GetError());
+        return 1;
     }
 
     TTF_Font *font = TTF_OpenFont(FONT_PATH, 40);
