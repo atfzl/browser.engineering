@@ -36,8 +36,10 @@ bool init() {
 }
 
 bool eventLoop(SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font,
-               SDL_Color *textColor, SDL_Color *textBackgroundColor,
                const char *message) {
+    SDL_Color textColor = {0x00, 0x00, 0x00, 0xFF};
+    SDL_Color textBackgroundColor = {0xFF, 0xFF, 0xFF, 0xFF};
+
     // Initialize renderer color white for the background
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
@@ -56,7 +58,7 @@ bool eventLoop(SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font,
     for (size_t i = 0; i < strlen(message); ++i) {
         const char c[] = {message[i], '\0'};
         SDL_Surface *textSurface =
-            TTF_RenderText_Shaded(font, c, *textColor, *textBackgroundColor);
+            TTF_RenderText_Shaded(font, c, textColor, textBackgroundColor);
         if (!textSurface) {
             printf(
                 "Unable to render text surface!\n"
@@ -139,9 +141,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    SDL_Color textColor = {0x00, 0x00, 0x00, 0xFF};
-    SDL_Color textBackgroundColor = {0xFF, 0xFF, 0xFF, 0xFF};
-
     const char message[] =
         "hello world /usr/bin/clang -Wall -std=c11 -g "
         "/Users/aafzal/scratch/browser.engineering/graphics.c -o "
@@ -162,8 +161,7 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        if (!eventLoop(renderer, window, font, &textColor, &textBackgroundColor,
-                       message)) {
+        if (!eventLoop(renderer, window, font, message)) {
             return 1;
         }
     }
