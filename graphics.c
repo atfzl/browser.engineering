@@ -81,8 +81,8 @@ void cleanup(SDL_Window *window, SDL_Renderer *renderer) {
     SDL_Quit();
 }
 
-bool eventLoop(SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font,
-               const char *message) {
+bool renderMessage(SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font,
+                   const char *message) {
     SDL_Color textColor = {0x00, 0x00, 0x00, 0xFF};
     SDL_Color textBackgroundColor = {0xFF, 0xFF, 0xFF, 0xFF};
 
@@ -166,6 +166,10 @@ int main(int argc, char *argv[]) {
         "-lcrypto -lSDL2 -lSDL2_ttf -lSDL2_image -lglfw Build finished "
         "successfully.";
 
+    if (!renderMessage(renderer, window, font, message)) {
+        return EXIT_FAILURE;
+    }
+
     // Event loop
     while (true) {
         SDL_Event e;
@@ -176,10 +180,6 @@ int main(int argc, char *argv[]) {
         // User requests quit
         if (e.type == SDL_QUIT) {
             break;
-        }
-
-        if (!eventLoop(renderer, window, font, message)) {
-            return EXIT_FAILURE;
         }
     }
 
