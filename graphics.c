@@ -35,6 +35,72 @@ bool init() {
     return true;
 }
 
+bool eventLoop(SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font,
+               SDL_Color *textColor, SDL_Color *textBackgroundColor,
+               const char *message) {
+    // Initialize renderer color white for the background
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+    // Clear screen
+    SDL_RenderClear(renderer);
+
+    int SCREEN_WIDTH;
+    int SCREEN_HEIGHT;
+    SDL_GL_GetDrawableSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
+
+    const int HSTEP = 24;
+    const int VSTEP = 48;
+    int cursor_x = HSTEP;
+    int cursor_y = VSTEP;
+
+    for (size_t i = 0; i < strlen(message); ++i) {
+        const char c[] = {message[i], '\0'};
+        SDL_Surface *textSurface =
+            TTF_RenderText_Shaded(font, c, *textColor, *textBackgroundColor);
+        if (!textSurface) {
+            printf(
+                "Unable to render text surface!\n"
+                "SDL2_ttf Error: %s\n",
+                TTF_GetError());
+            return false;
+        }
+
+        SDL_SetColorKey(textSurface, SDL_TRUE,
+                        SDL_MapRGB(textSurface->format, 0xFF, 0xFF, 0xFF));
+
+        // Create texture from surface pixels
+        SDL_Texture *textTexture =
+            SDL_CreateTextureFromSurface(renderer, textSurface);
+        if (!textTexture) {
+            printf(
+                "Unable to create texture from rendered text!\n"
+                "SDL2 Error: %s\n",
+                SDL_GetError());
+            return false;
+        }
+
+        SDL_Rect textRect = {cursor_x, cursor_y, textSurface->w,
+                             textSurface->h};
+
+        cursor_x += HSTEP;
+
+        if (cursor_x >= SCREEN_WIDTH - HSTEP) {
+            cursor_y += VSTEP;
+            cursor_x = HSTEP;
+        }
+
+        SDL_FreeSurface(textSurface);
+
+        // Draw text
+        SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+    }
+
+    // Update screen
+    SDL_RenderPresent(renderer);
+
+    return true;
+}
+
 int main(int argc, char *argv[]) {
     if (!init()) {
         return EXIT_FAILURE;
@@ -76,7 +142,7 @@ int main(int argc, char *argv[]) {
     SDL_Color textColor = {0x00, 0x00, 0x00, 0xFF};
     SDL_Color textBackgroundColor = {0xFF, 0xFF, 0xFF, 0xFF};
 
-    const char t[] =
+    const char message[] =
         "hello world /usr/bin/clang -Wall -std=c11 -g "
         "/Users/aafzal/scratch/browser.engineering/graphics.c -o "
         "/Users/aafzal/scratch/browser.engineering/graphics -framework OpenGL "
@@ -96,65 +162,10 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        // Initialize renderer color white for the background
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-
-        // Clear screen
-        SDL_RenderClear(renderer);
-
-        int SCREEN_WIDTH;
-        int SCREEN_HEIGHT;
-        SDL_GL_GetDrawableSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
-
-        const int HSTEP = 24;
-        const int VSTEP = 48;
-        int cursor_x = HSTEP;
-        int cursor_y = VSTEP;
-
-        for (size_t i = 0; i < strlen(t); ++i) {
-            const char c[] = {t[i], '\0'};
-            SDL_Surface *textSurface =
-                TTF_RenderText_Shaded(font, c, textColor, textBackgroundColor);
-            if (!textSurface) {
-                printf(
-                    "Unable to render text surface!\n"
-                    "SDL2_ttf Error: %s\n",
-                    TTF_GetError());
-                return 1;
-            }
-
-            SDL_SetColorKey(textSurface, SDL_TRUE,
-                            SDL_MapRGB(textSurface->format, 0xFF, 0xFF, 0xFF));
-
-            // Create texture from surface pixels
-            SDL_Texture *textTexture =
-                SDL_CreateTextureFromSurface(renderer, textSurface);
-            if (!textTexture) {
-                printf(
-                    "Unable to create texture from rendered text!\n"
-                    "SDL2 Error: %s\n",
-                    SDL_GetError());
-                return 1;
-            }
-
-            SDL_Rect textRect = {cursor_x, cursor_y, textSurface->w,
-                                 textSurface->h};
-
-            cursor_x += HSTEP;
-
-            if (cursor_x >= SCREEN_WIDTH - HSTEP) {
-                cursor_y += VSTEP;
-                cursor_x = HSTEP;
-            }
-
-            SDL_FreeSurface(textSurface);
-
-            // Draw text
-            SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+        if (!eventLoop(renderer, window, font, &textColor, &textBackgroundColor,
+                       message)) {
+            return 1;
         }
-
-        // Update screen
-        SDL_RenderPresent(renderer);
     }
 
     // Destroy renderer
