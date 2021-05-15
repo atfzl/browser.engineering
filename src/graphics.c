@@ -149,7 +149,7 @@ bool renderMessage(SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font,
     return true;
 }
 
-int main(int argc, char *argv[]) {
+int graphics_main(int argc, char *argv[]) {
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
     TTF_Font *font = NULL;
