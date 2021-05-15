@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "src/graphics.h"
 #include "src/http.h"
 
 int main() {
@@ -9,14 +10,15 @@ int main() {
 
     request(url, &response);
 
-    const char* x = lex(response.html);
+    const char* htmlText = lex(response.html);
 
-    printf("%s\n", x);
+    printf("%s\n", htmlText);
+
+    graphics_main(htmlText);
 
     free(response.status);
     free(response.headers);
     free(response.html);
 
-    return 0;
     return EXIT_SUCCESS;
 }

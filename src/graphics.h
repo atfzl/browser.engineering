@@ -1,1 +1,1 @@
-int graphics_main(int argc, char* argv[]);
+int graphics_main(const char* message);

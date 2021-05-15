@@ -11,7 +11,7 @@
 #define SCREEN_WIDTH_INITIAL 800
 #define SCREEN_HEIGHT_INITIAL 600
 
-#define FONT_PATH "JetBrainsMono-Regular.ttf"
+#define FONT_PATH "./assets/JetBrainsMono-Regular.ttf"
 
 bool init(SDL_Window **window, SDL_Renderer **renderer, TTF_Font **font) {
     // Initialize SDL2
@@ -149,7 +149,7 @@ bool renderMessage(SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font,
     return true;
 }
 
-int graphics_main(int argc, char *argv[]) {
+int graphics_main(const char *message) {
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
     TTF_Font *font = NULL;
@@ -157,14 +157,6 @@ int graphics_main(int argc, char *argv[]) {
     if (!init(&window, &renderer, &font)) {
         return EXIT_FAILURE;
     }
-
-    const char message[] =
-        "hello world /usr/bin/clang -Wall -std=c11 -g "
-        "/Users/aafzal/scratch/browser.engineering/graphics.c -o "
-        "/Users/aafzal/scratch/browser.engineering/graphics -framework OpenGL "
-        "-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib -lssl "
-        "-lcrypto -lSDL2 -lSDL2_ttf -lSDL2_image -lglfw Build finished "
-        "successfully.";
 
     if (!renderMessage(renderer, window, font, message)) {
         return EXIT_FAILURE;
