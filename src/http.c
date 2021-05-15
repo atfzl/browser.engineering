@@ -1,3 +1,5 @@
+#include "http.h"
+
 #include <arpa/inet.h>
 #include <assert.h>
 #include <netdb.h>
@@ -11,12 +13,6 @@
 #include <unistd.h>
 
 #define BUF_SIZE 2048
-
-struct request_response_type {
-    char* status;
-    char* headers;
-    char* html;
-};
 
 int starts_with(char* str, const char* prefix) {
     size_t len = strlen(str);
@@ -223,21 +219,4 @@ const char* lex(const char* html) {
     }
     text[++text_index] = '\0';
     return text;
-}
-
-int main() {
-    char url[] = "https://example.org/index.html";
-    struct request_response_type response;
-
-    request(url, &response);
-
-    const char* x = lex(response.html);
-
-    printf("%s\n", x);
-
-    free(response.status);
-    free(response.headers);
-    free(response.html);
-
-    return 0;
 }
