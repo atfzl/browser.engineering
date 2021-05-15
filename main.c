@@ -4,7 +4,7 @@
 #include "src/http.h"
 
 int main() {
-    char url[] = "https://example.org/index.htm";
+    char url[] = "https://example.org/index.html";
     struct request_response_type response;
 
     request(url, &response);
