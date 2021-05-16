@@ -2,6 +2,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 // Define MAX and MIN macros
 #define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
@@ -81,8 +82,40 @@ void cleanup(SDL_Window *window, SDL_Renderer *renderer) {
     SDL_Quit();
 }
 
-bool renderMessage(SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font,
-                   const char *message) {
+struct display_list_item {
+    char *c;
+    int cursor_x;
+    int cursor_y;
+};
+
+void layout(const char *message, int SCREEN_WIDTH,
+            struct display_list_item **display_list) {
+    const int HSTEP = 24;
+    const int VSTEP = 48;
+    int cursor_x = HSTEP;
+    int cursor_y = VSTEP;
+
+    *display_list = malloc(sizeof(struct display_list_item) * strlen(message));
+
+    for (size_t i = 0; i < strlen(message); ++i) {
+        const char c[] = {message[i], '\0'};
+
+        cursor_x += HSTEP;
+
+        if (cursor_x >= SCREEN_WIDTH - HSTEP) {
+            cursor_y += VSTEP;
+            cursor_x = HSTEP;
+        }
+
+        (*display_list)[i].c = malloc(2);
+        strcpy((*display_list)[i].c, c);
+        (*display_list)[i].cursor_x = cursor_x;
+        (*display_list)[i].cursor_y = cursor_y;
+    }
+}
+
+bool render(SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font,
+            const char *message, const struct display_list_item *display_list) {
     SDL_Color textColor = {0x00, 0x00, 0x00, 0xFF};
     SDL_Color textBackgroundColor = {0xFF, 0xFF, 0xFF, 0xFF};
 
@@ -92,19 +125,10 @@ bool renderMessage(SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font,
     // Clear screen
     SDL_RenderClear(renderer);
 
-    int SCREEN_WIDTH;
-    int SCREEN_HEIGHT;
-    SDL_GL_GetDrawableSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
-
-    const int HSTEP = 24;
-    const int VSTEP = 48;
-    int cursor_x = HSTEP;
-    int cursor_y = VSTEP;
-
     for (size_t i = 0; i < strlen(message); ++i) {
-        const char c[] = {message[i], '\0'};
+        struct display_list_item item = *(display_list + i);
         SDL_Surface *textSurface =
-            TTF_RenderText_Shaded(font, c, textColor, textBackgroundColor);
+            TTF_RenderText_Shaded(font, item.c, textColor, textBackgroundColor);
         if (!textSurface) {
             printf(
                 "Unable to render text surface!\n"
@@ -127,15 +151,8 @@ bool renderMessage(SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font,
             return false;
         }
 
-        SDL_Rect textRect = {cursor_x, cursor_y, textSurface->w,
+        SDL_Rect textRect = {item.cursor_x, item.cursor_y, textSurface->w,
                              textSurface->h};
-
-        cursor_x += HSTEP;
-
-        if (cursor_x >= SCREEN_WIDTH - HSTEP) {
-            cursor_y += VSTEP;
-            cursor_x = HSTEP;
-        }
 
         SDL_FreeSurface(textSurface);
 
@@ -158,7 +175,14 @@ int graphics_main(const char *message) {
         return EXIT_FAILURE;
     }
 
-    if (!renderMessage(renderer, window, font, message)) {
+    int SCREEN_WIDTH;
+    int SCREEN_HEIGHT;
+    SDL_GL_GetDrawableSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
+
+    struct display_list_item *display_list = NULL;
+    layout(message, SCREEN_WIDTH, &display_list);
+
+    if (!render(renderer, window, font, message, display_list)) {
         return EXIT_FAILURE;
     }
 

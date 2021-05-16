@@ -21,7 +21,7 @@ int main() {
 
     const char* htmlText = lex(response.html);
 
-    printf("%s\n", htmlText);
+    DEBUG_INFO("%s\n", htmlText);
 
     graphics_main(htmlText);
 
