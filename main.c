@@ -4,11 +4,20 @@
 #include "src/graphics.h"
 #include "src/http.h"
 
+int ENABLE_DEBUG = 0;
+void init_debug() { ENABLE_DEBUG = (getenv("DEBUG") != NULL); }
+#define DEBUG_INFO(format, ...) \
+    if (ENABLE_DEBUG) fprintf(stdout, format, __VA_ARGS__)
+
 int main() {
+    init_debug();
+
     char url[] = "https://example.org/index.html";
     struct request_response_type response;
 
     request(url, &response);
+
+    DEBUG_INFO("DEBUG: %s\n", url);
 
     const char* htmlText = lex(response.html);
 
