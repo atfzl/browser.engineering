@@ -4,10 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-// Define MAX and MIN macros
-#define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
-#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
-
 // Define screen dimensions
 #define SCREEN_WIDTH_INITIAL 800
 #define SCREEN_HEIGHT_INITIAL 600
