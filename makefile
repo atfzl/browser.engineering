@@ -1,7 +1,7 @@
 INCLUDE_PATHS ?= -I/usr/local/opt/openssl/include
 LIBRARY_PATHS ?= -L/usr/local/opt/openssl/lib
 LIBRARY_NAMES ?= -lssl -lcrypto -lSDL2 -lSDL2_ttf -lSDL2_image
-C_FLAGS ?= -Wall -std=c11
+C_FLAGS ?= -Wall -Wextra -std=c11
 
 OBJECT_FILES := $(shell find src -name "**.c" | sed "s/\.c//" | sed 's/$$/.o/' | sed "s/^src/build/")
 

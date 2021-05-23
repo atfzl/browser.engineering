@@ -111,7 +111,7 @@ void request(char* url, struct request_response_type* response) {
 
     char message[] = "GET /index.html HTTP/1.0\r\nHost: example.org\r\n\r\n";
 
-    if (SSL_write(ssl, message, strlen(message)) != strlen(message)) {
+    if ((size_t)SSL_write(ssl, message, strlen(message)) != strlen(message)) {
         perror("failed write");
         exit(EXIT_FAILURE);
     }

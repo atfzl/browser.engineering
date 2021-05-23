@@ -110,8 +110,8 @@ void layout(const char *message, int SCREEN_WIDTH,
     }
 }
 
-bool render(SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font,
-            const char *message, const struct display_list_item *display_list) {
+bool render(SDL_Renderer *renderer, TTF_Font *font, const char *message,
+            const struct display_list_item *display_list) {
     SDL_Color textColor = {0x00, 0x00, 0x00, 0xFF};
     SDL_Color textBackgroundColor = {0xFF, 0xFF, 0xFF, 0xFF};
 
@@ -178,7 +178,7 @@ int graphics_main(const char *message) {
     struct display_list_item *display_list = NULL;
     layout(message, SCREEN_WIDTH, &display_list);
 
-    if (!render(renderer, window, font, message, display_list)) {
+    if (!render(renderer, font, message, display_list)) {
         return EXIT_FAILURE;
     }
 
