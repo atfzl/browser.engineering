@@ -6,18 +6,18 @@
 
 #include "../src/utils/string.c"
 
-void TEST_starts_with__true(void** state) {
-    assert_true(starts_with("https://www.example.com", "https://"));
+void TEST_startsWith_true(void** state) {
+    assert_true(str_startsWith("https://www.example.com", "https://"));
 }
 
-void TEST_starts_with__false(void** state) {
-    assert_false(starts_with("https://www.example.com", "ttps://"));
+void TEST_startsWith_false(void** state) {
+    assert_false(str_startsWith("https://www.example.com", "ttps://"));
 }
 
 int main(int argc, char** argv) {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(TEST_starts_with__true),
-        cmocka_unit_test(TEST_starts_with__false),
+        cmocka_unit_test(TEST_startsWith_true),
+        cmocka_unit_test(TEST_startsWith_false),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

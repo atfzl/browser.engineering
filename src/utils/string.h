@@ -1,3 +1,3 @@
-int starts_with(char* str, const char* prefix);
+int str_startsWith(char* str, const char* prefix);
 
-void trim_start(char** str, const char* prefix);
+void str_trimStart(char** str, const char* prefix);

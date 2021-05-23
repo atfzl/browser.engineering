@@ -17,8 +17,8 @@
 #define BUF_SIZE 2048
 
 void request(char* url, struct request_response_type* response) {
-    assert(starts_with(url, "https://"));
-    trim_start(&url, "https://");
+    assert(str_startsWith(url, "https://"));
+    str_trimStart(&url, "https://");
 
     // create array of max size because we don't have Vector right now
     char* host = malloc((strlen(url) + 1) * sizeof(char));

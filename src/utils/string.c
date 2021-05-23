@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int starts_with(const char* str, const char* prefix) {
+int str_startsWith(const char* str, const char* prefix) {
     size_t len = strlen(str);
     size_t prefixLen = strlen(prefix);
 
@@ -22,7 +22,7 @@ int starts_with(const char* str, const char* prefix) {
     return 0;
 }
 
-void trim_start(char** str, const char* prefix) {
+void str_trimStart(char** str, const char* prefix) {
     size_t len = strlen(*str);
     size_t prefixLen = strlen(prefix);
 
