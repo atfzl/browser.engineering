@@ -1,3 +1,5 @@
+#pragma once
+
 struct request_response_type {
     char* status;
     char* headers;
