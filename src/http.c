@@ -13,6 +13,7 @@
 #include <unistd.h>
 
 #include "utils/string.h"
+#include "utils/vector.h"
 
 #define BUF_SIZE 2048
 
@@ -164,9 +165,7 @@ const char *lex(const char *html) {
   bool in_angle = false;
   size_t l = strlen(html);
 
-  char *text = malloc(9);   // NOLINT(readability-magic-numbers)
-  size_t text_max_size = 8; // NOLINT(readability-magic-numbers)
-  size_t text_index = 0;
+  vector_t *text = vector_init();
 
   for (size_t i = 0; i < l; ++i) {
     char c = html[i];
@@ -175,13 +174,9 @@ const char *lex(const char *html) {
     } else if (c == '>') {
       in_angle = false;
     } else if (!in_angle) {
-      if (text_index == text_max_size) {
-        text_max_size *= 2;
-        text = realloc(text, text_max_size + 1);
-      }
-      text[text_index++] = c;
+      vector_push(text, c);
     }
   }
-  text[++text_index] = '\0';
-  return text;
+
+  return vector_data(text);
 }
