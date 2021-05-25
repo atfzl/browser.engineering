@@ -12,8 +12,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include "data/string.h"
 #include "utils/string.h"
-#include "utils/vector.h"
 
 #define BUF_SIZE 2048
 
@@ -165,7 +165,7 @@ const char *lex(const char *html) {
   bool in_angle = false;
   size_t l = strlen(html);
 
-  vector_t *text = vector_init();
+  string_t *text = string_init();
 
   for (size_t i = 0; i < l; ++i) {
     char c = html[i];
@@ -174,9 +174,9 @@ const char *lex(const char *html) {
     } else if (c == '>') {
       in_angle = false;
     } else if (!in_angle) {
-      vector_push(text, c);
+      string_push(text, c);
     }
   }
 
-  return vector_data(text);
+  return string_data(text);
 }
