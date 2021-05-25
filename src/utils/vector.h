@@ -9,7 +9,7 @@ char *vector_data(const vector_t *v);
 
 size_t vector_len(const vector_t *v);
 
-void vector_push(vector_t *v, const char c);
+void vector_push(vector_t *v, char c);
 
 void vector_concat(vector_t *v, const char *s);
 

@@ -25,14 +25,14 @@ char *vector_data(const vector_t *v) { return v->data; }
 
 size_t vector_len(const vector_t *v) { return v->length; }
 
-void _vector_resize(vector_t *v) {
+void vector_resize_(vector_t *v) {
   v->_size = 2 * v->_size;
   v->data = realloc(v->data, sizeof(char) * v->_size);
 }
 
 void vector_push(vector_t *v, const char c) {
   if (v->length + 1 >= v->_size) {
-    _vector_resize(v);
+    vector_resize_(v);
   }
   (v->data)[v->length] = c;
   ++v->length;
@@ -43,7 +43,7 @@ void vector_concat(vector_t *v, const char *s) {
   size_t sLength = strlen(s);
 
   while (v->length + sLength >= v->_size) {
-    _vector_resize(v);
+    vector_resize_(v);
   }
   strcat(v->data, s);
   (v->length) += sLength;

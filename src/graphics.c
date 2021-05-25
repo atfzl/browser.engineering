@@ -48,6 +48,7 @@ bool init(SDL_Window **window, SDL_Renderer **renderer, TTF_Font **font) {
     return false;
   }
 
+  // NOLINTNEXTLINE(readability-magic-numbers)
   *font = TTF_OpenFont(FONT_PATH, 40);
   if (!*font) {
     printf("Unable to load font: '%s'!\n"
@@ -107,10 +108,13 @@ void layout(const char *message, int SCREEN_WIDTH,
 
 bool render(SDL_Renderer *renderer, TTF_Font *font, const char *message,
             const struct display_list_item *display_list) {
+  // NOLINTNEXTLINE(readability-magic-numbers)
   SDL_Color textColor = {0x00, 0x00, 0x00, 0xFF};
+  // NOLINTNEXTLINE(readability-magic-numbers)
   SDL_Color textBackgroundColor = {0xFF, 0xFF, 0xFF, 0xFF};
 
   // Initialize renderer color white for the background
+  // NOLINTNEXTLINE(readability-magic-numbers)
   SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
   // Clear screen
@@ -128,6 +132,7 @@ bool render(SDL_Renderer *renderer, TTF_Font *font, const char *message,
     }
 
     SDL_SetColorKey(textSurface, SDL_TRUE,
+                    // NOLINTNEXTLINE(readability-magic-numbers)
                     SDL_MapRGB(textSurface->format, 0xFF, 0xFF, 0xFF));
 
     // Create texture from surface pixels

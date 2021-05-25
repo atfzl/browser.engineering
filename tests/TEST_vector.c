@@ -8,6 +8,7 @@
 
 #include <string.h>
 
+// NOLINTNEXTLINE(bugprone-suspicious-include)
 #include "../src/utils/vector.c"
 
 void TEST_vector_push() {

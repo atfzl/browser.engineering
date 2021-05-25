@@ -17,7 +17,6 @@
 #define BUF_SIZE 2048
 
 void request(char *url, struct request_response_type *response) {
-  assert(str_startsWith(url, "https://"));
   str_trimStart(&url, "https://");
 
   // create array of max size because we don't have Vector right now
@@ -109,12 +108,14 @@ void request(char *url, struct request_response_type *response) {
 
   char message[] = "GET /index.html HTTP/1.0\r\nHost: example.org\r\n\r\n";
 
-  if ((size_t)SSL_write(ssl, message, strlen(message)) != strlen(message)) {
+  if ((size_t)SSL_write(ssl, message, (int)strlen(message)) !=
+      strlen(message)) {
     perror("failed write");
     exit(EXIT_FAILURE);
   }
 
   // TODO dynamically allocate memory as needed
+  // NOLINTNEXTLINE(readability-magic-numbers)
   char total_response[BUF_SIZE * 10];
   total_response[0] = '\0';
 
@@ -124,7 +125,8 @@ void request(char *url, struct request_response_type *response) {
     ssize_t nread = SSL_read(ssl, buf, BUF_SIZE);
     if (nread == 0) {
       break;
-    } else if (nread == -1) {
+    }
+    if (nread == -1) {
       perror("read");
       exit(EXIT_FAILURE);
     }
@@ -162,8 +164,8 @@ const char *lex(const char *html) {
   bool in_angle = false;
   size_t l = strlen(html);
 
-  char *text = malloc(9);
-  size_t text_max_size = 8;
+  char *text = malloc(9);   // NOLINT(readability-magic-numbers)
+  size_t text_max_size = 8; // NOLINT(readability-magic-numbers)
   size_t text_index = 0;
 
   for (size_t i = 0; i < l; ++i) {

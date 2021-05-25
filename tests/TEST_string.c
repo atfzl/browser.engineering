@@ -6,6 +6,7 @@
 #include <cmocka.h>
 // clang-format on
 
+// NOLINTNEXTLINE(bugprone-suspicious-include)
 #include "../src/utils/string.c"
 
 void TEST_startsWith_true() {
