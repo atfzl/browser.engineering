@@ -115,10 +115,7 @@ void request(char *url, struct request_response_type *response) {
     exit(EXIT_FAILURE);
   }
 
-  // TODO dynamically allocate memory as needed
-  // NOLINTNEXTLINE(readability-magic-numbers)
-  char total_response[BUF_SIZE * 10];
-  total_response[0] = '\0';
+  string_t *totalResponse = string_init();
 
   char buf[BUF_SIZE];
 
@@ -131,18 +128,21 @@ void request(char *url, struct request_response_type *response) {
       perror("read");
       exit(EXIT_FAILURE);
     }
-    strncat(total_response, buf, nread);
+    buf[nread] = '\0';
+    string_concat(totalResponse, buf);
   }
 
   SSL_free(ssl);
   close(SocketFD);
   SSL_CTX_free(ctx);
 
+  const char *rawTotalResponse = string_raw(totalResponse);
+
   /* +1 during malloc is making space for \0 */
-  char *first_newline = strstr(total_response, "\r\n");
-  size_t status_len = first_newline - total_response;
+  char *first_newline = strstr(rawTotalResponse, "\r\n");
+  size_t status_len = first_newline - rawTotalResponse;
   response->status = malloc((status_len + 1) * sizeof(char));
-  strncpy(response->status, total_response, status_len);
+  strncpy(response->status, rawTotalResponse, status_len);
   (response->status)[status_len] = '\0';
 
   first_newline += 2; // skip \r\n
@@ -155,7 +155,8 @@ void request(char *url, struct request_response_type *response) {
 
   second_newline += 4; // skip \r\n\r\n
 
-  size_t html_len = (total_response + strlen(total_response) - second_newline);
+  size_t html_len =
+      (rawTotalResponse + strlen(rawTotalResponse) - second_newline);
   response->html = malloc((html_len + 1) * sizeof(char));
   strncpy(response->html, second_newline, html_len);
   (response->html)[html_len] = '\0';
