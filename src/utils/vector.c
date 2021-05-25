@@ -1,9 +1,10 @@
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct {
-    int _size;
-    int length;
+    size_t _size;
+    size_t length;
     char* data;
 } vector_t;
 
