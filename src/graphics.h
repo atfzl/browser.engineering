@@ -1,3 +1,3 @@
 #pragma once
 
-int graphics_main(const char* message);
+int graphics_main(const char *message);

@@ -6,28 +6,29 @@
 
 int ENABLE_DEBUG = 0;
 void init_debug() { ENABLE_DEBUG = (getenv("DEBUG") != NULL); }
-#define DEBUG_INFO(format, ...) \
-    if (ENABLE_DEBUG) fprintf(stdout, "DEBUG: " format, __VA_ARGS__)
+#define DEBUG_INFO(format, ...)                                                \
+  if (ENABLE_DEBUG)                                                            \
+  fprintf(stdout, "DEBUG: " format, __VA_ARGS__)
 
 int main() {
-    init_debug();
+  init_debug();
 
-    char url[] = "https://example.org/index.html";
-    struct request_response_type response;
+  char url[] = "https://example.org/index.html";
+  struct request_response_type response;
 
-    request(url, &response);
+  request(url, &response);
 
-    DEBUG_INFO("%s\n", url);
+  DEBUG_INFO("%s\n", url);
 
-    const char* htmlText = lex(response.html);
+  const char *htmlText = lex(response.html);
 
-    DEBUG_INFO("%s\n", htmlText);
+  DEBUG_INFO("%s\n", htmlText);
 
-    graphics_main(htmlText);
+  graphics_main(htmlText);
 
-    free(response.status);
-    free(response.headers);
-    free(response.html);
+  free(response.status);
+  free(response.headers);
+  free(response.html);
 
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
