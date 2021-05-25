@@ -5,7 +5,7 @@ typedef struct string_t string_t;
 
 string_t *string_init();
 
-char *string_data(const string_t *v);
+char *string_raw(const string_t *v);
 
 size_t string_len(const string_t *v);
 

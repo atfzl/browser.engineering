@@ -21,7 +21,7 @@ string_t *string_init() {
   return v;
 }
 
-char *string_data(const string_t *v) { return v->data; }
+char *string_raw(const string_t *v) { return v->data; }
 
 size_t string_len(const string_t *v) { return v->length; }
 

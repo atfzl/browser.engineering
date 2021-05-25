@@ -178,5 +178,5 @@ const char *lex(const char *html) {
     }
   }
 
-  return string_data(text);
+  return string_raw(text);
 }
