@@ -1,14 +1,16 @@
+// clang-format off
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
 #include <stdint.h>
 #include <cmocka.h>
+// clang-format on
 
 #include <string.h>
 
 #include "../src/utils/vector.c"
 
-void TEST_vector_push(void** state) {
+void TEST_vector_push() {
     vector_t* v = vector_init();
 
     assert_string_equal(v->data, "");
@@ -41,7 +43,7 @@ void TEST_vector_push(void** state) {
     vector_destroy(v);
 }
 
-void TEST_vector_concat(void** state) {
+void TEST_vector_concat() {
     vector_t* v = vector_init();
 
     assert_string_equal(v->data, "");
@@ -63,7 +65,7 @@ void TEST_vector_concat(void** state) {
     vector_destroy(v);
 }
 
-int main(int argc, char** argv) {
+int main() {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(TEST_vector_push),
         cmocka_unit_test(TEST_vector_concat),
