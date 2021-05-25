@@ -1,0 +1,5 @@
+-Wall
+-Wextra
+-std=gnu18
+-I/usr/local/opt/openssl/include
+-I/usr/local/include

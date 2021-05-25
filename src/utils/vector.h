@@ -1,7 +1,7 @@
 #pragma once
 #include <stdlib.h>
 
-typedef struct vector_t;
+typedef struct vector_t vector_t;
 
 vector_t* vector_init();
 

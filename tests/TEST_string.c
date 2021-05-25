@@ -1,8 +1,11 @@
+#include <setjmp.h>
 #include <stdarg.h>
 #include <stddef.h>
-#include <setjmp.h>
 #include <stdint.h>
+
+// clang-format off
 #include <cmocka.h>
+// clang-format on
 
 #include "../src/utils/string.c"
 
