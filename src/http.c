@@ -41,8 +41,6 @@ void request(char *url, http_response_t *response) {
     exit(EXIT_FAILURE);
   }
 
-  url_destroy(urlObject);
-
   int SocketFD =
       socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 
@@ -83,13 +81,25 @@ void request(char *url, http_response_t *response) {
 
   freeaddrinfo(result);
 
-  char message[] = "GET /index.html HTTP/1.0\r\nHost: example.org\r\n\r\n";
+  string_t *message = string_init();
+  string_concat(message, "GET ");
+  string_concat(message, urlObject->path);
+  string_concat(message, " HTTP/1.0\r\n");
+  string_concat(message, "Host: ");
+  string_concat(message, urlObject->host);
+  string_concat(message, "\r\n\r\n");
 
-  if ((size_t)SSL_write(ssl, message, (int)strlen(message)) !=
-      strlen(message)) {
+  url_destroy(urlObject);
+
+  char *rawMessage = string_raw(message);
+
+  if ((size_t)SSL_write(ssl, rawMessage, (int)string_len(message)) !=
+      string_len(message)) {
     perror("failed write");
     exit(EXIT_FAILURE);
   }
+
+  string_destroy(message);
 
   string_t *totalResponse = string_init();
 
