@@ -20,33 +20,28 @@
 void request(char *url, http_response_t *response) {
   str_trimStart(&url, "https://");
 
-  // create array of max size because we don't have Vector right now
-  char *host = malloc((strlen(url) + 1) * sizeof(char));
-  char *path = malloc((strlen(url) + 1) * sizeof(char));
+  string_t *host = string_init();
+  string_t *path = string_init();
 
   {
-    size_t hostIndex = 0;
-    size_t pathIndex = 0;
-    int slash_found = 0;
+    int slash_found = false;
     for (unsigned int i = 0; i < strlen(url); ++i) {
       char ch = url[i];
       if (ch == '/') {
-        slash_found = 1;
-        path[pathIndex++] = '/';
+        slash_found = true;
+        string_push(path, '/');
         continue;
       }
       if (!slash_found) {
-        host[hostIndex++] = ch;
+        string_push(host, ch);
       } else {
-        path[pathIndex++] = ch;
+        string_push(path, ch);
       }
     }
-    host[hostIndex] = '\0';
-    path[pathIndex] = '\0';
   }
 
-  assert(strcmp(host, "example.org") == 0);
-  assert(strcmp(path, "/index.html") == 0);
+  assert(strcmp(string_raw(host), "example.org") == 0);
+  assert(strcmp(string_raw(path), "/index.html") == 0);
 
   struct addrinfo hints;
   struct addrinfo *result;
@@ -58,10 +53,10 @@ void request(char *url, http_response_t *response) {
   hints.ai_flags = 0;
   hints.ai_protocol = 0;
 
-  int s = getaddrinfo(host, "https", &hints, &result);
+  int s = getaddrinfo(string_raw(host), "https", &hints, &result);
 
-  free(host);
-  free(path);
+  string_destroy(host);
+  string_destroy(path);
 
   if (s != 0) {
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
