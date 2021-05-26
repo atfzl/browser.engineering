@@ -10,7 +10,7 @@ int main() {
   init_debug();
 
   char url[] = "https://example.org/index.html";
-  request_response_type response;
+  http_response_t response;
 
   request(url, &response);
 

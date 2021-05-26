@@ -4,8 +4,8 @@ typedef struct {
   char *status;
   char *headers;
   char *html;
-} request_response_type;
+} http_response_t;
 
-void request(char *url, request_response_type *response);
+void request(char *url, http_response_t *response);
 
 const char *lex(const char *html);
