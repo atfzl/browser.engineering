@@ -10,7 +10,7 @@ int main() {
   init_debug();
 
   char url[] = "https://example.org/index.html";
-  struct request_response_type response;
+  request_response_type response;
 
   request(url, &response);
 

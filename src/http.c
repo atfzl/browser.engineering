@@ -17,7 +17,7 @@
 
 #define BUF_SIZE 2048
 
-void request(char *url, struct request_response_type *response) {
+void request(char *url, request_response_type *response) {
   str_trimStart(&url, "https://");
 
   // create array of max size because we don't have Vector right now
