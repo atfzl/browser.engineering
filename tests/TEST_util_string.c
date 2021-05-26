@@ -9,7 +9,6 @@
 // NOLINTNEXTLINE(bugprone-suspicious-include)
 #include "../src/utils/string.c"
 #include "cmocka.h"
-#include <assert.h>
 
 void TEST_startsWith() {
   assert_true(str_startsWith("https://www.example.com", "https://"));

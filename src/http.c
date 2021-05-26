@@ -14,34 +14,16 @@
 
 #include "data/string.h"
 #include "utils/string.h"
+#include "utils/url.h"
 
 #define BUF_SIZE 2048
 
 void request(char *url, http_response_t *response) {
-  str_trimStart(&url, "https://");
+  url_t *urlObject = url_init(url);
 
-  string_t *host = string_init();
-  string_t *path = string_init();
-
-  {
-    int slash_found = false;
-    for (unsigned int i = 0; i < strlen(url); ++i) {
-      char ch = url[i];
-      if (ch == '/') {
-        slash_found = true;
-        string_push(path, '/');
-        continue;
-      }
-      if (!slash_found) {
-        string_push(host, ch);
-      } else {
-        string_push(path, ch);
-      }
-    }
+  if (!urlObject) {
+    exit(EXIT_FAILURE);
   }
-
-  assert(strcmp(string_raw(host), "example.org") == 0);
-  assert(strcmp(string_raw(path), "/index.html") == 0);
 
   struct addrinfo hints;
   struct addrinfo *result;
@@ -53,10 +35,7 @@ void request(char *url, http_response_t *response) {
   hints.ai_flags = 0;
   hints.ai_protocol = 0;
 
-  int s = getaddrinfo(string_raw(host), "https", &hints, &result);
-
-  string_destroy(host);
-  string_destroy(path);
+  int s = getaddrinfo(urlObject->host, "https", &hints, &result);
 
   if (s != 0) {
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
