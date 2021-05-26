@@ -32,6 +32,7 @@ void request(char *url, request_response_type *response) {
       char ch = url[i];
       if (ch == '/') {
         slash_found = 1;
+        path[pathIndex++] = '/';
         continue;
       }
       if (!slash_found) {
@@ -45,7 +46,7 @@ void request(char *url, request_response_type *response) {
   }
 
   assert(strcmp(host, "example.org") == 0);
-  assert(strcmp(path, "index.html") == 0);
+  assert(strcmp(path, "/index.html") == 0);
 
   struct addrinfo hints;
   struct addrinfo *result;
