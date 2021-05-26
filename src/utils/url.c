@@ -36,4 +36,5 @@ void url_destroy(url_t *url) {
   free(url->scheme);
   free(url->host);
   free(url->path);
+  free(url);
 };

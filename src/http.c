@@ -36,11 +36,12 @@ void request(char *url, http_response_t *response) {
   hints.ai_protocol = 0;
 
   int s = getaddrinfo(urlObject->host, "https", &hints, &result);
-
   if (s != 0) {
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
     exit(EXIT_FAILURE);
   }
+
+  url_destroy(urlObject);
 
   int SocketFD =
       socket(result->ai_family, result->ai_socktype, result->ai_protocol);
