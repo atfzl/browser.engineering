@@ -14,6 +14,9 @@ build/%.o: src/%.c
 	mkdir -p $(dir $@)
 	cc $(C_FLAGS) -c -o $@ $< $(INCLUDE_PATHS)
 
+run:
+	./build/a.out
+
 .PHONY: clean
 clean:
 	rm -rf ./build
