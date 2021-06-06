@@ -1,6 +1,10 @@
 #pragma once
 
-typedef struct url_t url_t;
+typedef struct {
+  char *scheme;
+  char *host;
+  char *path;
+} url_t;
 
 url_t *url_init(const char *str);
 
