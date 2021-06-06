@@ -35,6 +35,6 @@ setup-git-hooks:
 remove-git-hooks:
 	rm .git/hooks/pre-commit
 
-.PHONY: clean
+.PHONY: clean, tests/*.c
 clean:
 	rm -rf ./build
