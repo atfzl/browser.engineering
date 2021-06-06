@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "./src/utils/debug.h"
+#include "./src/debug.h"
 
 int main() {
   debug_init();
