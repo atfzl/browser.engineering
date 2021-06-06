@@ -8,7 +8,7 @@
 
 #include "../src/data/url.h"
 
-void TEST_util_url() {
+static void TEST_util_url() {
   url_t *url = url_init("https://www.example.com/index.html");
   assert_string_equal(url->scheme, "https");
   assert_string_equal(url->host, "www.example.com");

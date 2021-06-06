@@ -9,20 +9,20 @@
 #include "../src/utils/str.h"
 #include <string.h>
 
-void TEST_startsWith() {
+static void TEST_startsWith() {
   assert_true(str_startsWith("https://www.example.com", "https://"));
   assert_false(str_startsWith("https://www.example.com", "ttps://"));
 }
 
-void TEST_indexOf() {
+static void TEST_indexOf() {
   assert_int_equal(str_indexOf("https://www.example.com", 'c'), 20);
   assert_int_equal(str_indexOf("https://www.example.com", 'h'), 0);
-  assert_int_equal(str_indexOf("https://www.example.com", 'm'), 22);
+  assert_int_equal(str_indexOf("https://www.example.com", 'm'), 15);
   assert_int_equal(str_indexOf("https://www.example.com", ':'), 5);
-  assert_null(str_indexOf("https://www.example.com", 'x'));
+  assert_int_equal(str_indexOf("https://www.example.com", 'z'), -1);
 }
 
-void TEST_slice() {
+static void TEST_slice() {
   const char *str = "hello world";
 
   assert_string_equal(str_slice(str, 0, 0), "h");
@@ -38,6 +38,7 @@ void TEST_slice() {
 int main() {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test(TEST_startsWith),
+      cmocka_unit_test(TEST_indexOf),
       cmocka_unit_test(TEST_slice),
   };
 

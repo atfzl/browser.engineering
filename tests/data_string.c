@@ -9,7 +9,7 @@
 #include "../src/data/string.h"
 #include <string.h>
 
-void TEST_string_push() {
+static void TEST_string_push() {
   string_t *v = string_init();
 
   assert_string_equal(v->data, "");
@@ -42,7 +42,7 @@ void TEST_string_push() {
   string_destroy(v);
 }
 
-void TEST_string_concat() {
+static void TEST_string_concat() {
   string_t *v = string_init();
 
   assert_string_equal(v->data, "");
