@@ -1,4 +1,7 @@
 #include "./http.h"
+#include "./data/url.h"
+#include "./utils/debug.h"
+#include <stdlib.h>
 
 http_response_t *make_http_request(const char *urlString) {
   url_t *urlObject = url_init(urlString);

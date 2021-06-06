@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "./src/debug.h"
 #include "./src/http.h"
+#include "./src/utils/debug.h"
 
 int main() {
   debug_init();
