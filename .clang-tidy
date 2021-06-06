@@ -1,6 +1,8 @@
 Checks:         '
                   clang-diagnostic-*,
                   clang-analyzer-*,
+                  -clang-analyzer-osx.cocoa*,
+                  -clang-analyzer-cplusplus*,
                   readability-*,
                   modernize-*,
                   bugprone-*,
