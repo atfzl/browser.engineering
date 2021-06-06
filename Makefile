@@ -7,6 +7,8 @@ OBJECT_FILES := $(shell find src -name "**.c" | sed "s/\.c//" | sed 's/$$/.o/' |
 
 #$(info    OBJECT_FILES is $(OBJECT_FILES))
 
+release: build/a.out
+
 build/a.out: main.c $(OBJECT_FILES)
 	cc $(C_FLAGS) -o $@ main.c $(OBJECT_FILES) $(LIBRARY_PATHS) $(LIBRARY_NAMES)
 
