@@ -2,9 +2,7 @@
 
 #include <stdlib.h>
 
-int str_startsWith(char *str, const char *prefix);
-
-void str_trimStart(char **str, const char *prefix);
+int str_startsWith(const char *str, const char *prefix);
 
 int str_indexOf(const char *str, char c);
 
