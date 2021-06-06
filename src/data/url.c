@@ -1,9 +1,7 @@
+#include "./url.h"
+#include "../utils/str.h"
 #include <stdlib.h>
 #include <string.h>
-
-#include "./url.h"
-
-#include "../utils/str.h"
 
 url_t *url_init(const char *str) {
   int colonIndex = str_indexOf(str, ':');
