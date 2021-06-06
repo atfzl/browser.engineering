@@ -92,7 +92,7 @@ void layout(const char *message, int SCREEN_WIDTH,
   for (size_t i = 0; i < strlen(message); ++i) {
     const char c[] = {message[i], '\0'};
 
-    cursor_x +=     24;
+    cursor_x += HSTEP;
 
     if (cursor_x >= SCREEN_WIDTH - HSTEP) {
       cursor_y += VSTEP;
