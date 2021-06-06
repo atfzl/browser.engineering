@@ -3,6 +3,7 @@ Checks:             '
                       clang-analyzer-*,
                       -clang-analyzer-osx.cocoa*,
                       -clang-analyzer-cplusplus*,
+                      -clang-analyzer-security.insecureAPI.strcpy, # strcpy_s is not available
                       readability-*,
                       modernize-*,
                       bugprone-*,
