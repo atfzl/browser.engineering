@@ -14,6 +14,14 @@ void TEST_startsWith() {
   assert_false(str_startsWith("https://www.example.com", "ttps://"));
 }
 
+void TEST_indexOf() {
+  assert_int_equal(str_indexOf("https://www.example.com", 'c'), 20);
+  assert_int_equal(str_indexOf("https://www.example.com", 'h'), 0);
+  assert_int_equal(str_indexOf("https://www.example.com", 'm'), 22);
+  assert_int_equal(str_indexOf("https://www.example.com", ':'), 5);
+  assert_null(str_indexOf("https://www.example.com", 'x'));
+}
+
 void TEST_slice() {
   const char *str = "hello world";
 
