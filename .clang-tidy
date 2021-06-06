@@ -9,7 +9,7 @@ Checks:             '
                       bugprone-*,
                       misc-*,
                       google-runtime-int,
-                      llvm-header-guard,
+                      -llvm-header-guard,
                     '
 FormatStyle:        'file'
 WarningsAsErrors:   '*'
