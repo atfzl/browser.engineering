@@ -2,11 +2,12 @@
 #include <stdlib.h>
 
 #include "./src/debug.h"
+#include "./src/http.h"
 
 int main() {
   debug_init();
 
-  debug("%s\n", "hello world");
+  make_http_request("https://example.org/index.html");
 
   return EXIT_SUCCESS;
 }

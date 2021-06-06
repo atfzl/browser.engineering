@@ -25,7 +25,7 @@ build/%.o: src/%.c
 	mkdir -p $(dir $@)
 	cc $(C_FLAGS) -c -o $@ $< $(INCLUDE_PATHS)
 
-run:
+run: build/a.out
 	./build/a.out
 
 setup-git-hooks:
