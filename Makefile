@@ -12,6 +12,12 @@ release: build/a.out
 debug: C_FLAGS += -g
 debug: build/a.out
 
+test: tests/*.c
+
+tests/*.c: $(OBJECT_FILES)
+	mkdir -p build
+	cc $(C_FLAGS) -g -o build/test.out $@ $(OBJECT_FILES) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LIBRARY_NAMES) -lcmocka && ./build/test.out
+
 build/a.out: main.c $(OBJECT_FILES)
 	cc $(C_FLAGS) -o $@ main.c $(OBJECT_FILES) $(LIBRARY_PATHS) $(LIBRARY_NAMES)
 
