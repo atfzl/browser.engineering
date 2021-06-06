@@ -10,6 +10,9 @@ OBJECT_FILES := $(shell find src -name "**.c" | sed "s/\.c//" | sed 's/$$/.o/' |
 build/a.out: main.c $(OBJECT_FILES)
 	cc $(C_FLAGS) -o $@ main.c $(OBJECT_FILES) $(LIBRARY_PATHS) $(LIBRARY_NAMES)
 
+debug: C_FLAGS += -g
+debug: build/a.out
+
 build/%.o: src/%.c
 	mkdir -p $(dir $@)
 	cc $(C_FLAGS) -c -o $@ $< $(INCLUDE_PATHS)
