@@ -1,16 +1,18 @@
-Checks:         '
-                  clang-diagnostic-*,
-                  clang-analyzer-*,
-                  -clang-analyzer-osx.cocoa*,
-                  -clang-analyzer-cplusplus*,
-                  readability-*,
-                  modernize-*,
-                  bugprone-*,
-                  misc-*,
-                  google-runtime-int,
-                  llvm-header-guard,
-                '
-FormatStyle:    'file'
+Checks:             '
+                      clang-diagnostic-*,
+                      clang-analyzer-*,
+                      -clang-analyzer-osx.cocoa*,
+                      -clang-analyzer-cplusplus*,
+                      readability-*,
+                      modernize-*,
+                      bugprone-*,
+                      misc-*,
+                      google-runtime-int,
+                      llvm-header-guard,
+                    '
+FormatStyle:        'file'
+WarningsAsErrors:   '*'
 CheckOptions:
-  - key:             readability-braces-around-statements.ShortStatementLines
-    value:           '1'
+  - key:            readability-braces-around-statements.ShortStatementLines
+    value:          '1'
+# HeaderFilterRegex:  '' # update it later to only generate warning from user code
