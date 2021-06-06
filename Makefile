@@ -17,6 +17,9 @@ build/%.o: src/%.c
 run:
 	./build/a.out
 
+setup-git-hooks:
+	ln -s ../../git-hooks/pre-commit .git/hooks
+
 .PHONY: clean
 clean:
 	rm -rf ./build

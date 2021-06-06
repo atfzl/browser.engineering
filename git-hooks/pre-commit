@@ -1,0 +1,7 @@
+#!/bin/sh
+
+for FILE in $(git diff --cached --name-only)
+do
+        /usr/local/opt/llvm/bin/clang-format -i $FILE
+        /usr/local/opt/llvm/bin/clang-tidy $FILE
+done
