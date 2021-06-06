@@ -177,6 +177,7 @@ int graphics_main(const char *message) {
   layout(message, SCREEN_WIDTH, &display_list);
 
   if (!render(renderer, font, message, display_list)) {
+    free(display_list);
     return EXIT_FAILURE;
   }
 
@@ -192,6 +193,8 @@ int graphics_main(const char *message) {
       break;
     }
   }
+
+  free(display_list);
 
   cleanup(window, renderer);
 
