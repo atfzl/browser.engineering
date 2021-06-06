@@ -19,6 +19,10 @@ run:
 
 setup-git-hooks:
 	ln -s ../../git-hooks/pre-commit .git/hooks
+	chmod +x .git/hooks/pre-commit
+
+remove-git-hooks:
+	rm .git/hooks/pre-commit
 
 .PHONY: clean
 clean:
