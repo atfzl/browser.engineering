@@ -4,7 +4,7 @@
 #include "./src/utils/debug.h"
 
 int main() {
-  init_debug();
+  debug_init();
 
   debug("%s\n", "hello world");
 
