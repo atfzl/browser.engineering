@@ -58,18 +58,3 @@ char *str_slice(const char *str, int startIndex, int endIndex) {
 
   return newString;
 }
-
-void str_trimStart(char **str, const char *prefix) {
-  size_t len = strlen(*str);
-  size_t prefixLen = strlen(prefix);
-
-  if (len < prefixLen) {
-    return;
-  }
-
-  size_t j = 0;
-  while (j < prefixLen && prefix[j] == (char)**str) {
-    ++(*str);
-    ++j;
-  }
-}
