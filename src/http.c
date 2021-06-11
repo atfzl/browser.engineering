@@ -1,4 +1,5 @@
 #include "./http.h"
+#include "./data/string.h"
 #include "./data/url.h"
 #include "./utils/debug.h"
 #include <arpa/inet.h>
@@ -8,6 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <unistd.h>
+
+#define BUF_SIZE 2048
 
 struct addrinfo *http_getIPAddressInfo(const char *hostName) {
   struct addrinfo hints;
@@ -51,33 +55,76 @@ static int http_getSocketFD(const struct addrinfo *addressInfo) {
   return socketFD;
 }
 
-static SSL *http_getSSL(int socketFD) {
+static int http_getSSL(int socketFD, SSL **ssl, SSL_CTX **sslContext) {
   const SSL_METHOD *method =
       TLS_client_method(); /* Create new client-method instance */
-  SSL_CTX *ctx = SSL_CTX_new(method);
+  *sslContext = SSL_CTX_new(method);
 
-  if (ctx == NULL) {
+  if (*sslContext == NULL) {
     ERR_print_errors_fp(stderr);
-    return NULL;
+    return -1;
   }
 
-  SSL *ssl = SSL_new(ctx);
+  *ssl = SSL_new(*sslContext);
   if (ssl == NULL) {
     fprintf(stderr, "SSL_new() failed\n");
-    return NULL;
+    return -1;
   }
 
-  SSL_set_fd(ssl, socketFD);
+  SSL_set_fd(*ssl, socketFD);
 
-  const int status = SSL_connect(ssl);
+  const int status = SSL_connect(*ssl);
   if (status != 1) {
-    SSL_get_error(ssl, status);
+    SSL_get_error(*ssl, status);
     ERR_print_errors_fp(stderr); // High probability this doesn't do anything
     fprintf(stderr, "SSL_connect failed with SSL_get_error code %d\n", status);
-    return NULL;
+    return -1;
   }
 
-  return ssl;
+  return 0;
+}
+
+string_t *http_createRawMessageRequest(url_t *url) {
+  string_t *message = string_init();
+  string_concat(message, "GET ");
+  string_concat(message, url->path);
+  string_concat(message, " HTTP/1.0\r\n");
+  string_concat(message, "Host: ");
+  string_concat(message, url->host);
+  string_concat(message, "\r\n\r\n");
+
+  return message;
+}
+
+void http_parseRawResponse(const char *rawResponseString,
+                           http_response_t **response) {
+  *response = malloc(sizeof(http_response_t));
+
+  /* +1 during malloc is making space for \0 */
+  char *first_newline = strstr(rawResponseString, "\r\n");
+  size_t status_len = first_newline - rawResponseString;
+  (*response)->status = malloc((status_len + 1) * sizeof(char));
+  strncpy((*response)->status, rawResponseString, status_len);
+  ((*response)->status)[status_len] = '\0';
+
+  first_newline += 2; // skip \r\n
+
+  char *second_newline = strstr(first_newline, "\r\n\r\n");
+  size_t headers_len = second_newline - first_newline;
+  (*response)->headers = malloc((headers_len + 1) * sizeof(char));
+  strncpy((*response)->headers, first_newline, headers_len);
+  ((*response)->headers)[headers_len] = '\0';
+
+  second_newline += 4; // skip \r\n\r\n
+
+  size_t html_len =
+      (rawResponseString + strlen(rawResponseString) - second_newline);
+  (*response)->html = malloc((html_len + 1) * sizeof(char));
+  strncpy((*response)->html, second_newline, html_len);
+  ((*response)->html)[html_len] = '\0';
+
+  debug("HTTP Response Status: %s\n", (*response)->status);
+  debug("HTTP Response Headers: \n%s\n", (*response)->headers);
 }
 
 http_response_t *http_createRequest(const char *urlString) {
@@ -91,15 +138,56 @@ http_response_t *http_createRequest(const char *urlString) {
 
   int socketFD = http_getSocketFD(addressInfo);
 
+  freeaddrinfo(addressInfo);
+
   if (socketFD == -1) {
     return NULL;
   }
 
-  SSL *ssl = http_getSSL(socketFD);
+  SSL *ssl = NULL;
+  SSL_CTX *sslContext = NULL;
+  http_getSSL(socketFD, &ssl, &sslContext);
 
   if (!ssl) {
     return NULL;
   }
+
+  string_t *message = http_createRawMessageRequest(urlObject);
+
+  if ((size_t)SSL_write(ssl, message->data, (int)(message->length)) !=
+      message->length) {
+    perror("failed write");
+    return NULL;
+  }
+
+  string_destroy(message);
+
+  string_t *totalResponse = string_init();
+
+  char buf[BUF_SIZE];
+
+  while (1) {
+    ssize_t nread = SSL_read(ssl, buf, BUF_SIZE);
+    if (nread == 0) {
+      break;
+    }
+    if (nread == -1) {
+      perror("read");
+      exit(EXIT_FAILURE);
+    }
+    buf[nread] = '\0';
+    string_concat(totalResponse, buf);
+  }
+
+  SSL_free(ssl);
+  close(socketFD);
+  SSL_CTX_free(sslContext);
+
+  http_response_t *response;
+
+  http_parseRawResponse(totalResponse->data, &response);
+
+  free(response);
 
   return NULL;
 }
