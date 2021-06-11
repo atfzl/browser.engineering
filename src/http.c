@@ -13,7 +13,7 @@
 
 #define BUF_SIZE 2048
 
-struct addrinfo *http_getIPAddressInfo(const char *hostName) {
+static struct addrinfo *http_getIPAddressInfo(const char *hostName) {
   struct addrinfo hints;
 
   memset(&hints, 0, sizeof(hints));
@@ -84,7 +84,7 @@ static int http_getSSL(int socketFD, SSL **ssl, SSL_CTX **sslContext) {
   return 0;
 }
 
-string_t *http_createRawMessageRequest(url_t *url) {
+static string_t *http_createRawMessageRequest(url_t *url) {
   string_t *message = string_init();
   string_concat(message, "GET ");
   string_concat(message, url->path);
@@ -96,8 +96,8 @@ string_t *http_createRawMessageRequest(url_t *url) {
   return message;
 }
 
-void http_parseRawResponse(const char *rawResponseString,
-                           http_response_t **response) {
+static void http_parseRawResponse(const char *rawResponseString,
+                                  http_response_t **response) {
   *response = malloc(sizeof(http_response_t));
 
   /* +1 during malloc is making space for \0 */
@@ -124,7 +124,7 @@ void http_parseRawResponse(const char *rawResponseString,
   ((*response)->html)[html_len] = '\0';
 }
 
-int http_sendRawMessage(string_t *message, SSL *ssl) {
+static int http_sendRawMessage(string_t *message, SSL *ssl) {
   if ((size_t)SSL_write(ssl, message->data, (int)(message->length)) !=
       message->length) {
     perror("failed write");
@@ -134,7 +134,7 @@ int http_sendRawMessage(string_t *message, SSL *ssl) {
   return 0;
 }
 
-int http_readRawResponse(SSL *ssl, string_t *responseString) {
+static int http_readRawResponse(SSL *ssl, string_t *responseString) {
   char buf[BUF_SIZE];
 
   while (1) {
