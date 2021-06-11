@@ -127,6 +127,35 @@ void http_parseRawResponse(const char *rawResponseString,
   debug("HTTP Response Headers: \n%s\n", (*response)->headers);
 }
 
+int http_sendRawMessage(string_t *message, SSL *ssl) {
+  if ((size_t)SSL_write(ssl, message->data, (int)(message->length)) !=
+      message->length) {
+    perror("failed write");
+    return -1;
+  }
+
+  return 0;
+}
+
+int http_readRawResponse(SSL *ssl, string_t *responseString) {
+  char buf[BUF_SIZE];
+
+  while (1) {
+    ssize_t nread = SSL_read(ssl, buf, BUF_SIZE);
+    if (nread == 0) {
+      break;
+    }
+    if (nread == -1) {
+      perror("read");
+      return -1;
+    }
+    buf[nread] = '\0';
+    string_concat(responseString, buf);
+  }
+
+  return 0;
+}
+
 http_response_t *http_createRequest(const char *urlString) {
   url_t *urlObject = url_init(urlString);
 
@@ -152,41 +181,23 @@ http_response_t *http_createRequest(const char *urlString) {
     return NULL;
   }
 
-  string_t *message = http_createRawMessageRequest(urlObject);
+  string_t *rawMessage = http_createRawMessageRequest(urlObject);
+  http_sendRawMessage(rawMessage, ssl);
+  string_destroy(rawMessage);
 
-  if ((size_t)SSL_write(ssl, message->data, (int)(message->length)) !=
-      message->length) {
-    perror("failed write");
+  string_t *responseString = string_init();
+  if (http_readRawResponse(ssl, responseString) == -1) {
+    string_destroy(responseString);
     return NULL;
   }
 
-  string_destroy(message);
+  http_response_t *response;
+  http_parseRawResponse(responseString->data, &response);
 
-  string_t *totalResponse = string_init();
-
-  char buf[BUF_SIZE];
-
-  while (1) {
-    ssize_t nread = SSL_read(ssl, buf, BUF_SIZE);
-    if (nread == 0) {
-      break;
-    }
-    if (nread == -1) {
-      perror("read");
-      exit(EXIT_FAILURE);
-    }
-    buf[nread] = '\0';
-    string_concat(totalResponse, buf);
-  }
-
+  string_destroy(responseString);
+  SSL_CTX_free(sslContext);
   SSL_free(ssl);
   close(socketFD);
-  SSL_CTX_free(sslContext);
-
-  http_response_t *response;
-
-  http_parseRawResponse(totalResponse->data, &response);
-
   free(response);
 
   return NULL;
