@@ -122,9 +122,6 @@ void http_parseRawResponse(const char *rawResponseString,
   (*response)->html = malloc((html_len + 1) * sizeof(char));
   strncpy((*response)->html, second_newline, html_len);
   ((*response)->html)[html_len] = '\0';
-
-  debug("HTTP Response Status: %s\n", (*response)->status);
-  debug("HTTP Response Headers: \n%s\n", (*response)->headers);
 }
 
 int http_sendRawMessage(string_t *message, SSL *ssl) {
@@ -193,6 +190,9 @@ http_response_t *http_createRequest(const char *urlString) {
 
   http_response_t *response;
   http_parseRawResponse(responseString->data, &response);
+
+  debug("HTTP Response Status: %s\n", response->status);
+  debug("HTTP Response Headers: \n%s\n", response->headers);
 
   string_destroy(responseString);
   SSL_CTX_free(sslContext);
