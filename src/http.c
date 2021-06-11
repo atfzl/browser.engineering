@@ -33,7 +33,7 @@ struct addrinfo *http_getIPAddressInfo(const char *hostName) {
   char ipstr[INET6_ADDRSTRLEN];
   inet_ntop(addressInfoResult->ai_family, addressInfoResult->ai_addr, ipstr,
             sizeof ipstr);
-  debug("IP v4 address for %s: %s\n", hostName, ipstr);
+  debug("IPv4 address for %s: %s\n", hostName, ipstr);
 
   return addressInfoResult;
 }
