@@ -7,7 +7,7 @@
 int main() {
   debug_init();
 
-  make_http_request("https://example.org/index.html");
+  http_createRequest("https://example.org/index.html");
 
   return EXIT_SUCCESS;
 }
