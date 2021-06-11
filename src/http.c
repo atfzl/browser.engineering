@@ -154,13 +154,13 @@ int http_readRawResponse(SSL *ssl, string_t *responseString) {
 }
 
 http_response_t *http_createRequest(const char *urlString) {
-  url_t *urlObject = url_init(urlString);
+  url_t *url = url_init(urlString);
 
   debug("URL String: %s\n", urlString);
-  debug("URL Scheme: %s, URL Host: %s, URL Path: %s\n", urlObject->scheme,
-        urlObject->host, urlObject->path);
+  debug("URL Scheme: %s, URL Host: %s, URL Path: %s\n", url->scheme, url->host,
+        url->path);
 
-  struct addrinfo *addressInfo = http_getIPAddressInfo(urlObject->host);
+  struct addrinfo *addressInfo = http_getIPAddressInfo(url->host);
 
   int socketFD = http_getSocketFD(addressInfo);
 
@@ -178,7 +178,7 @@ http_response_t *http_createRequest(const char *urlString) {
     return NULL;
   }
 
-  string_t *rawMessage = http_createRawMessageRequest(urlObject);
+  string_t *rawMessage = http_createRawMessageRequest(url);
   http_sendRawMessage(rawMessage, ssl);
   string_destroy(rawMessage);
 
