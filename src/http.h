@@ -6,4 +6,4 @@ typedef struct {
   char *html;
 } http_response_t;
 
-http_response_t *createHTTPRequest(const char *urlString);
+http_response_t *http_createRequest(const char *urlString);

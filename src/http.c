@@ -3,7 +3,7 @@
 #include "./utils/debug.h"
 #include <stdlib.h>
 
-http_response_t *createHTTPRequest(const char *urlString) {
+http_response_t *http_createRequest(const char *urlString) {
   url_t *urlObject = url_init(urlString);
 
   debug("URL Scheme: %s, URL Host: %s, URL Path: %s\n", urlObject->scheme,
