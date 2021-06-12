@@ -194,6 +194,7 @@ http_response_t *http_createRequest(const char *urlString) {
   debug("HTTP Response Status: %s\n", response->status);
   debug("HTTP Response Headers: \n%s\n", response->headers);
 
+  url_destroy(url);
   string_destroy(responseString);
   SSL_CTX_free(sslContext);
   SSL_free(ssl);
