@@ -1,6 +1,7 @@
 #include "./http.h"
 #include "./data/string.h"
 #include "./data/url.h"
+#include "./http_request.h"
 #include "./utils/debug.h"
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -39,8 +40,11 @@ static struct addrinfo *http_getIPAddressInfo(const char *hostName) {
 }
 
 static int http_getSocketFD(const struct addrinfo *addressInfo) {
+  debug("before socket()\n");
   int socketFD = socket(addressInfo->ai_family, addressInfo->ai_socktype,
                         addressInfo->ai_protocol);
+
+  debug("after socket()\n");
 
   if (socketFD == -1) {
     perror("cannot create socket");
@@ -51,6 +55,8 @@ static int http_getSocketFD(const struct addrinfo *addressInfo) {
     perror("cannot connect to socket");
     return -1;
   }
+
+  debug("after socket connect()");
 
   return socketFD;
 }
@@ -154,16 +160,18 @@ static int http_readRawResponse(SSL *ssl, string_t *responseString) {
   return 0;
 }
 
-http_response_t *http_createRequest(const char *urlString) {
-  url_t *url = url_init(urlString);
+http_response_t *http_requestHTML(const char *urlString) {
+  http_request_t *request = http_request_init(urlString);
 
   debug("URL String: %s\n", urlString);
-  debug("URL Scheme: %s, URL Host: %s, URL Path: %s\n", url->scheme, url->host,
-        url->path);
+  debug("URL Scheme: %s, URL Host: %s, URL Path: %s\n", request->url->scheme,
+        request->url->host, request->url->path);
 
-  struct addrinfo *addressInfo = http_getIPAddressInfo(url->host);
+  struct addrinfo *addressInfo = http_getIPAddressInfo(request->url->host);
 
+  debug("Trying to get socket FD\n");
   int socketFD = http_getSocketFD(addressInfo);
+  debug("Got socket FD: %d\n", socketFD);
 
   freeaddrinfo(addressInfo);
 
@@ -181,7 +189,7 @@ http_response_t *http_createRequest(const char *urlString) {
     return NULL;
   }
 
-  string_t *rawMessage = http_createRawMessageRequest(url);
+  string_t *rawMessage = http_createRawMessageRequest(request->url);
   debug("%s\n", "Sending message");
   http_sendRawMessage(rawMessage, ssl);
   debug("%s\n", "Sent message");
@@ -202,7 +210,7 @@ http_response_t *http_createRequest(const char *urlString) {
   debug("HTTP Response Status: %s\n", response->status);
   debug("HTTP Response Headers: \n%s\n", response->headers);
 
-  url_destroy(url);
+  http_request_destroy(request);
   string_destroy(responseString);
   SSL_CTX_free(sslContext);
   SSL_free(ssl);
