@@ -148,6 +148,7 @@ static int http_readRawResponse(SSL *ssl, string_t *responseString) {
     }
     buf[nread] = '\0';
     string_concat(responseString, buf);
+    debug("SSL Read buffer length:\n %s\n", responseString->data);
   }
 
   return 0;
@@ -172,21 +173,28 @@ http_response_t *http_createRequest(const char *urlString) {
 
   SSL *ssl = NULL;
   SSL_CTX *sslContext = NULL;
+  debug("%s\n", "Trying get SSL");
   http_getSSL(socketFD, &ssl, &sslContext);
+  debug("%s\n", "Got SSL");
 
   if (!ssl) {
     return NULL;
   }
 
   string_t *rawMessage = http_createRawMessageRequest(url);
+  debug("%s\n", "Sending message");
   http_sendRawMessage(rawMessage, ssl);
+  debug("%s\n", "Sent message");
   string_destroy(rawMessage);
 
   string_t *responseString = string_init();
+  debug("Reading response message\n");
   if (http_readRawResponse(ssl, responseString) == -1) {
     string_destroy(responseString);
     return NULL;
   }
+
+  debug("Read response message length: %zu\n", responseString->length);
 
   http_response_t *response;
   http_parseRawResponse(responseString->data, &response);

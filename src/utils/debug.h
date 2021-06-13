@@ -6,6 +6,6 @@
 void debug_init();
 
 int ENABLE_DEBUG;
-#define debug(format, ...)                                                     \
+#define debug(...)                                                             \
   if (ENABLE_DEBUG)                                                            \
-  fprintf(stdout, "DEBUG: " format, __VA_ARGS__)
+  fprintf(stdout, "DEBUG: " __VA_ARGS__)
