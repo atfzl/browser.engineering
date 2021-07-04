@@ -2,6 +2,7 @@
 #include "./data/string.h"
 #include "./data/url.h"
 #include "./httpRequest.h"
+#include "./httpResponse.h"
 #include "./utils/debug.h"
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -102,34 +103,6 @@ static string_t *http_createRawMessageRequest(url_t *url) {
   return message;
 }
 
-static void http_parseRawResponse(const char *rawResponseString,
-                                  http_response_t **response) {
-  *response = malloc(sizeof(http_response_t));
-
-  /* +1 during malloc is making space for \0 */
-  char *first_newline = strstr(rawResponseString, "\r\n");
-  size_t status_len = first_newline - rawResponseString;
-  (*response)->status = malloc((status_len + 1) * sizeof(char));
-  strncpy((*response)->status, rawResponseString, status_len);
-  ((*response)->status)[status_len] = '\0';
-
-  first_newline += 2; // skip \r\n
-
-  char *second_newline = strstr(first_newline, "\r\n\r\n");
-  size_t headers_len = second_newline - first_newline;
-  (*response)->headers = malloc((headers_len + 1) * sizeof(char));
-  strncpy((*response)->headers, first_newline, headers_len);
-  ((*response)->headers)[headers_len] = '\0';
-
-  second_newline += 4; // skip \r\n\r\n
-
-  size_t html_len =
-      (rawResponseString + strlen(rawResponseString) - second_newline);
-  (*response)->html = malloc((html_len + 1) * sizeof(char));
-  strncpy((*response)->html, second_newline, html_len);
-  ((*response)->html)[html_len] = '\0';
-}
-
 static int http_sendRawMessage(string_t *message, SSL *ssl) {
   if ((size_t)SSL_write(ssl, message->data, (int)(message->length)) !=
       message->length) {
@@ -160,7 +133,7 @@ static int http_readRawResponse(SSL *ssl, string_t *responseString) {
   return 0;
 }
 
-http_response_t *http_requestHTML(const char *urlString) {
+httpResponse_t *http_requestHTML(const char *urlString) {
   httpRequest_t *request = httpRequest_init(urlString);
 
   debug("URL String: %s\n", urlString);
@@ -204,18 +177,16 @@ http_response_t *http_requestHTML(const char *urlString) {
 
   debug("Read response message length: %zu\n", responseString->length);
 
-  http_response_t *response;
-  http_parseRawResponse(responseString->data, &response);
+  httpResponse_t *httpResponse = httpResponse_init(responseString->data);
 
-  debug("HTTP Response Status: %s\n", response->status);
-  debug("HTTP Response Headers: \n%s\n", response->headers);
+  debug("HTTP Response Status: %s\n", httpResponse->status);
+  debug("HTTP Response Headers: \n%s\n", httpResponse->headers);
 
   httpRequest_destroy(request);
   string_destroy(responseString);
   SSL_CTX_free(sslContext);
   SSL_free(ssl);
   close(socketFD);
-  free(response);
 
-  return NULL;
+  return httpResponse;
 }

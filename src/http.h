@@ -1,9 +1,5 @@
 #pragma once
 
-typedef struct {
-  char *status;
-  char *headers;
-  char *html;
-} http_response_t;
+#include "./httpResponse.h"
 
-http_response_t *http_requestHTML(const char *urlString);
+httpResponse_t *http_requestHTML(const char *urlString);

@@ -7,7 +7,12 @@
 int main() {
   debug_init();
 
-  http_requestHTML("https://example.org/index.html");
+  httpResponse_t *httpResponse =
+      http_requestHTML("https://example.org/index.html");
+
+  printf("http response html: %s\n", httpResponse->html);
+
+  httpResponse_destroy(httpResponse);
 
   return EXIT_SUCCESS;
 }
