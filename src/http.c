@@ -3,6 +3,7 @@
 #include "./data/url.h"
 #include "./httpRequest.h"
 #include "./httpResponse.h"
+#include "./httpSSL.h"
 #include "./utils/debug.h"
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -62,37 +63,6 @@ static int http_getSocketFD(const struct addrinfo *addressInfo) {
   debug("Got socket FD: %d\n", socketFD);
 
   return socketFD;
-}
-
-static int http_getSSL(int socketFD, SSL **ssl, SSL_CTX **sslContext) {
-  debug("%s\n", "Trying get SSL");
-  const SSL_METHOD *method =
-      TLS_client_method(); /* Create new client-method instance */
-  *sslContext = SSL_CTX_new(method);
-
-  if (*sslContext == NULL) {
-    ERR_print_errors_fp(stderr);
-    return -1;
-  }
-
-  *ssl = SSL_new(*sslContext);
-  if (ssl == NULL) {
-    fprintf(stderr, "SSL_new() failed\n");
-    return -1;
-  }
-
-  SSL_set_fd(*ssl, socketFD);
-
-  const int status = SSL_connect(*ssl);
-  if (status != 1) {
-    SSL_get_error(*ssl, status);
-    ERR_print_errors_fp(stderr); // High probability this doesn't do anything
-    fprintf(stderr, "SSL_connect failed with SSL_get_error code %d\n", status);
-    return -1;
-  }
-
-  debug("%s\n", "Got SSL");
-  return 0;
 }
 
 static string_t *http_createRawMessageRequest(url_t *url) {
@@ -155,34 +125,31 @@ httpResponse_t *http_requestHTML(const char *urlString) {
     return NULL;
   }
 
-  SSL *ssl = NULL;
-  SSL_CTX *sslContext = NULL;
-  http_getSSL(socketFD, &ssl, &sslContext);
+  httpSSL_t *httpSSL = httpSSL_init(socketFD);
 
-  if (!ssl) {
+  if (!httpSSL->ssl) {
     return NULL;
   }
 
   string_t *rawMessage = http_createRawMessageRequest(request->url);
-  http_sendRawMessage(rawMessage, ssl);
+  http_sendRawMessage(rawMessage, httpSSL->ssl);
   string_destroy(rawMessage);
 
   string_t *responseString = string_init();
 
-  if (http_readRawResponse(ssl, responseString) == -1) {
+  if (http_readRawResponse(httpSSL->ssl, responseString) == -1) {
     string_destroy(responseString);
     return NULL;
   }
 
   httpResponse_t *httpResponse = httpResponse_init(responseString->data);
+  string_destroy(responseString);
 
   debug("HTTP Response Status: %s\n", httpResponse->status);
   debug("HTTP Response Headers: \n%s\n", httpResponse->headers);
 
   httpRequest_destroy(request);
-  string_destroy(responseString);
-  SSL_CTX_free(sslContext);
-  SSL_free(ssl);
+  httpSSL_destroy(httpSSL);
   close(socketFD);
 
   return httpResponse;
