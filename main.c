@@ -4,6 +4,7 @@
 #include "./src/debug.h"
 #include "./src/html/htmlShow.h"
 #include "./src/http/http.h"
+#include "./src/render/renderHTML.h"
 
 int main() {
   debug_init();
@@ -15,7 +16,7 @@ int main() {
 
   string_t *htmlBody = htmlShow(httpResponse->html);
 
-  printf("html body: %s\n", htmlBody->data);
+  renderHTML(htmlBody->data);
 
   httpResponse_destroy(httpResponse);
 
