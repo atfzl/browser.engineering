@@ -1,4 +1,7 @@
+#pragma once
+
 #include "./data/url.h"
+#include <stdlib.h>
 
 typedef struct {
   url_t *url;
