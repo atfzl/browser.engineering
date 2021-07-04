@@ -1,5 +1,5 @@
 #include "./url.h"
-#include "../utils/debug.h";
+#include "../utils/debug.h"
 #include "../utils/str.h"
 #include <stdlib.h>
 #include <string.h>
