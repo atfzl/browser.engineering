@@ -1,7 +1,7 @@
 #include "./http.h"
 #include "./data/string.h"
 #include "./data/url.h"
-#include "./http_request.h"
+#include "./httpRequest.h"
 #include "./utils/debug.h"
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -161,7 +161,7 @@ static int http_readRawResponse(SSL *ssl, string_t *responseString) {
 }
 
 http_response_t *http_requestHTML(const char *urlString) {
-  http_request_t *request = http_request_init(urlString);
+  httpRequest_t *request = httpRequest_init(urlString);
 
   debug("URL String: %s\n", urlString);
   debug("URL Scheme: %s, URL Host: %s, URL Path: %s\n", request->url->scheme,
@@ -210,7 +210,7 @@ http_response_t *http_requestHTML(const char *urlString) {
   debug("HTTP Response Status: %s\n", response->status);
   debug("HTTP Response Headers: \n%s\n", response->headers);
 
-  http_request_destroy(request);
+  httpRequest_destroy(request);
   string_destroy(responseString);
   SSL_CTX_free(sslContext);
   SSL_free(ssl);
