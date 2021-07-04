@@ -41,6 +41,7 @@ static struct addrinfo *http_getIPAddressInfo(const char *hostName) {
 }
 
 static int http_getSocketFD(const struct addrinfo *addressInfo) {
+  debug("Trying to get socket FD\n");
   debug("before socket()\n");
   int socketFD = socket(addressInfo->ai_family, addressInfo->ai_socktype,
                         addressInfo->ai_protocol);
@@ -58,11 +59,13 @@ static int http_getSocketFD(const struct addrinfo *addressInfo) {
   }
 
   debug("after socket connect()");
+  debug("Got socket FD: %d\n", socketFD);
 
   return socketFD;
 }
 
 static int http_getSSL(int socketFD, SSL **ssl, SSL_CTX **sslContext) {
+  debug("%s\n", "Trying get SSL");
   const SSL_METHOD *method =
       TLS_client_method(); /* Create new client-method instance */
   *sslContext = SSL_CTX_new(method);
@@ -88,6 +91,7 @@ static int http_getSSL(int socketFD, SSL **ssl, SSL_CTX **sslContext) {
     return -1;
   }
 
+  debug("%s\n", "Got SSL");
   return 0;
 }
 
@@ -104,16 +108,20 @@ static string_t *http_createRawMessageRequest(url_t *url) {
 }
 
 static int http_sendRawMessage(string_t *message, SSL *ssl) {
+  debug("%s\n", "Sending message");
   if ((size_t)SSL_write(ssl, message->data, (int)(message->length)) !=
       message->length) {
     perror("failed write");
     return -1;
   }
 
+  debug("%s\n", "Sent message");
   return 0;
 }
 
 static int http_readRawResponse(SSL *ssl, string_t *responseString) {
+  debug("Reading response message\n");
+
   char buf[BUF_SIZE];
 
   while (1) {
@@ -130,21 +138,16 @@ static int http_readRawResponse(SSL *ssl, string_t *responseString) {
     debug("SSL Read buffer length:\n %s\n", responseString->data);
   }
 
+  debug("Read response message length: %zu\n", responseString->length);
   return 0;
 }
 
 httpResponse_t *http_requestHTML(const char *urlString) {
   httpRequest_t *request = httpRequest_init(urlString);
 
-  debug("URL String: %s\n", urlString);
-  debug("URL Scheme: %s, URL Host: %s, URL Path: %s\n", request->url->scheme,
-        request->url->host, request->url->path);
-
   struct addrinfo *addressInfo = http_getIPAddressInfo(request->url->host);
 
-  debug("Trying to get socket FD\n");
   int socketFD = http_getSocketFD(addressInfo);
-  debug("Got socket FD: %d\n", socketFD);
 
   freeaddrinfo(addressInfo);
 
@@ -154,28 +157,22 @@ httpResponse_t *http_requestHTML(const char *urlString) {
 
   SSL *ssl = NULL;
   SSL_CTX *sslContext = NULL;
-  debug("%s\n", "Trying get SSL");
   http_getSSL(socketFD, &ssl, &sslContext);
-  debug("%s\n", "Got SSL");
 
   if (!ssl) {
     return NULL;
   }
 
   string_t *rawMessage = http_createRawMessageRequest(request->url);
-  debug("%s\n", "Sending message");
   http_sendRawMessage(rawMessage, ssl);
-  debug("%s\n", "Sent message");
   string_destroy(rawMessage);
 
   string_t *responseString = string_init();
-  debug("Reading response message\n");
+
   if (http_readRawResponse(ssl, responseString) == -1) {
     string_destroy(responseString);
     return NULL;
   }
-
-  debug("Read response message length: %zu\n", responseString->length);
 
   httpResponse_t *httpResponse = httpResponse_init(responseString->data);
 

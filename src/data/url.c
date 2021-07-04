@@ -1,4 +1,5 @@
 #include "./url.h"
+#include "../utils/debug.h";
 #include "../utils/str.h"
 #include <stdlib.h>
 #include <string.h>
@@ -28,6 +29,9 @@ url_t *url_init(const char *str) {
   url->scheme = str_slice(str, 0, colonIndex - 1);
   url->host = str_slice(str, colonIndex + 3, pathSlashIndex - 1);
   url->path = str_slice(str, pathSlashIndex, strlen(str) - 1);
+
+  debug("URL Scheme: %s, URL Host: %s, URL Path: %s\n", url->scheme, url->host,
+        url->path);
 
   return url;
 }
