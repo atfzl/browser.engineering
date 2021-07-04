@@ -127,7 +127,7 @@ httpResponse_t *http_requestHTML(const char *urlString) {
 
   httpSSL_t *httpSSL = httpSSL_init(socketFD);
 
-  if (!httpSSL->ssl) {
+  if (!httpSSL) {
     return NULL;
   }
 

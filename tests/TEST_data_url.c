@@ -6,7 +6,7 @@
 #include <cmocka.h>
 // clang-format on
 
-#include "../src/data/url.h"
+#include "../src/http/url.h"
 
 static void TEST_util_url() {
   url_t *url = url_init("https://www.example.com/index.html");
