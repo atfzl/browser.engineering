@@ -1,5 +1,5 @@
 #include "./httpSSL.h"
-#include "./utils/debug.h"
+#include "../utils/debug.h"
 #include <openssl/err.h>
 
 httpSSL_t *httpSSL_init(int socketFD) {

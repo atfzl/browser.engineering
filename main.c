@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "./src/http.h"
+#include "./src/http/http.h"
 #include "./src/utils/debug.h"
 
 int main() {

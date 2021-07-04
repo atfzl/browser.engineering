@@ -1,10 +1,10 @@
 #include "./http.h"
-#include "./data/string.h"
-#include "./data/url.h"
+#include "../data/string.h"
+#include "../utils/debug.h"
 #include "./httpRequest.h"
 #include "./httpResponse.h"
 #include "./httpSSL.h"
-#include "./utils/debug.h"
+#include "./url.h"
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <openssl/err.h>
