@@ -41,4 +41,5 @@ httpSSL_t *httpSSL_init(int socketFD) {
 void httpSSL_destroy(httpSSL_t *httpSSL) {
   SSL_CTX_free(httpSSL->sslContext);
   SSL_free(httpSSL->ssl);
+  free(httpSSL);
 }
