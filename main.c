@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "./src/debug.h"
+#include "./src/html/htmlShow.h"
 #include "./src/http/http.h"
 
 int main() {
@@ -10,7 +11,11 @@ int main() {
   httpResponse_t *httpResponse =
       http_requestHTML("https://example.org/index.html");
 
-  printf("http response html: %s\n", httpResponse->html);
+  debug("http response html: %s\n", httpResponse->html);
+
+  string_t *htmlBody = htmlShow(httpResponse->html);
+
+  printf("html body: %s\n", htmlBody->data);
 
   httpResponse_destroy(httpResponse);
 
