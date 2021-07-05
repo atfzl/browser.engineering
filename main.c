@@ -12,6 +12,10 @@ int main() {
   httpResponse_t *httpResponse =
       http_requestHTML("https://example.org/index.html");
 
+  if (!httpResponse) {
+    return EXIT_FAILURE;
+  }
+
   debug("http response html: %s\n", httpResponse->html);
 
   string_t *htmlBody = htmlShow(httpResponse->html);
