@@ -123,8 +123,6 @@ httpResponse_t *http_requestHTML(const char *urlString) {
 
   int socketFD = http_getSocketFD(addressInfo);
 
-  freeaddrinfo(addressInfo);
-
   if (socketFD == -1) {
     return NULL;
   }
@@ -136,7 +134,10 @@ httpResponse_t *http_requestHTML(const char *urlString) {
   }
 
   string_t *rawMessage = http_createRawMessageRequest(request->url);
-  http_sendRawMessage(rawMessage, httpSSL->ssl);
+  if (http_sendRawMessage(rawMessage, httpSSL->ssl) == -1) {
+    return NULL;
+  }
+
   string_destroy(rawMessage);
 
   string_t *responseString = string_init();
@@ -152,6 +153,7 @@ httpResponse_t *http_requestHTML(const char *urlString) {
   debug("HTTP Response Status: %s\n", httpResponse->status);
   debug("HTTP Response Headers: \n%s\n", httpResponse->headers);
 
+  freeaddrinfo(addressInfo);
   httpRequest_destroy(request);
   httpSSL_destroy(httpSSL);
   close(socketFD);
