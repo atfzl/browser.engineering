@@ -7,6 +7,10 @@ httpRequest_t *httpRequest_init(const char *urlString) {
 
   url_t *url = url_init(urlString);
 
+  if (!url) {
+    return NULL;
+  }
+
   httpRequest_t *request = malloc(sizeof(httpRequest_t));
 
   request->url = url;

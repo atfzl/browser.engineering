@@ -111,7 +111,15 @@ static int http_readRawResponse(SSL *ssl, string_t *responseString) {
 httpResponse_t *http_requestHTML(const char *urlString) {
   httpRequest_t *request = httpRequest_init(urlString);
 
+  if (!request) {
+    return NULL;
+  }
+
   struct addrinfo *addressInfo = http_getIPAddressInfo(request->url->host);
+
+  if (!addressInfo) {
+    return NULL;
+  }
 
   int socketFD = http_getSocketFD(addressInfo);
 
