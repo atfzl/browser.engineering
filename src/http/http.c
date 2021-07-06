@@ -183,6 +183,5 @@ fail_getIPAddressInfo:
   freeaddrinfo(addressInfo);
 fail_requestInit:
   httpRequest_destroy(request);
-
   return NULL;
 }
