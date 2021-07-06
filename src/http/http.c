@@ -73,7 +73,9 @@ fail_connect:
 }
 
 static string_t *http_createRawMessageRequest(url_t *url) {
-  string_t *message = string_init();
+  string_t *message = NULL;
+
+  message = string_init();
   string_concat(message, "GET ");
   string_concat(message, url->path);
   string_concat(message, " HTTP/1.0\r\n");
@@ -89,17 +91,20 @@ static int http_sendRawMessage(string_t *message, SSL *ssl) {
   if ((size_t)SSL_write(ssl, message->data, (int)(message->length)) !=
       message->length) {
     perror("failed write");
-    return -1;
+    goto fail_SSL_write;
   }
 
   debug("%s\n", "Sent message");
   return 0;
+
+fail_SSL_write:
+  return -1;
 }
 
 static int http_readRawResponse(SSL *ssl, string_t *responseString) {
-  debug("Reading response message\n");
-
   char buf[BUF_SIZE];
+
+  debug("Reading response message\n");
 
   while (1) {
     ssize_t nread = SSL_read(ssl, buf, BUF_SIZE);
@@ -108,7 +113,7 @@ static int http_readRawResponse(SSL *ssl, string_t *responseString) {
     }
     if (nread == -1) {
       perror("read");
-      return -1;
+      goto fail_SSL_read;
     }
     buf[nread] = '\0';
     string_concat(responseString, buf);
@@ -117,6 +122,9 @@ static int http_readRawResponse(SSL *ssl, string_t *responseString) {
 
   debug("Read response message length: %zu\n", responseString->length);
   return 0;
+
+fail_SSL_read:
+  return -1;
 }
 
 httpResponse_t *http_requestHTML(const char *urlString) {
