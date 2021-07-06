@@ -28,8 +28,10 @@ static struct addrinfo *http_getIPAddressInfo(const char *hostName) {
 
   addressInfoError = getaddrinfo(hostName, "https", &hints, &addressInfoResult);
 
-  if (addressInfoError != 0)
+  if (addressInfoError != 0) {
+    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(addressInfoError));
     goto fail_addrinfo;
+  }
 
   inet_ntop(addressInfoResult->ai_family, addressInfoResult->ai_addr, ipstr,
             sizeof ipstr);
@@ -37,32 +39,37 @@ static struct addrinfo *http_getIPAddressInfo(const char *hostName) {
   return addressInfoResult;
 
 fail_addrinfo:
-  fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(addressInfoError));
   return NULL;
 }
 
 static int http_getSocketFD(const struct addrinfo *addressInfo) {
+  int socketFD = -1;
+
   debug("Trying to get socket FD\n");
   debug("before socket()\n");
-  int socketFD = socket(addressInfo->ai_family, addressInfo->ai_socktype,
-                        addressInfo->ai_protocol);
+
+  socketFD = socket(addressInfo->ai_family, addressInfo->ai_socktype,
+                    addressInfo->ai_protocol);
 
   debug("after socket()\n");
 
   if (socketFD == -1) {
     perror("cannot create socket");
-    return -1;
+    goto fail_socket;
   }
 
   if (connect(socketFD, addressInfo->ai_addr, addressInfo->ai_addrlen) == -1) {
     perror("cannot connect to socket");
-    return -1;
+    goto fail_connect;
   }
 
   debug("after socket connect()");
   debug("Got socket FD: %d\n", socketFD);
-
   return socketFD;
+
+fail_socket:
+fail_connect:
+  return -1;
 }
 
 static string_t *http_createRawMessageRequest(url_t *url) {
