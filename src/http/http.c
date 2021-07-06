@@ -109,37 +109,45 @@ static int http_readRawResponse(SSL *ssl, string_t *responseString) {
 }
 
 httpResponse_t *http_requestHTML(const char *urlString) {
-  httpRequest_t *request = httpRequest_init(urlString);
+  httpRequest_t *request = NULL;
+  struct addrinfo *addressInfo = NULL;
+  int socketFD = -1;
+  httpSSL_t *httpSSL = NULL;
+  string_t *rawMessage = NULL;
+  string_t *responseString = NULL;
+  httpResponse_t *httpResponse = NULL;
+
+  request = httpRequest_init(urlString);
 
   if (!request)
     goto fail_requestInit;
 
-  struct addrinfo *addressInfo = http_getIPAddressInfo(request->url->host);
+  addressInfo = http_getIPAddressInfo(request->url->host);
 
   if (!addressInfo)
     goto fail_getIPAddressInfo;
 
-  int socketFD = http_getSocketFD(addressInfo);
+  socketFD = http_getSocketFD(addressInfo);
 
   if (socketFD == -1)
     goto fail_getSocketFD;
 
-  httpSSL_t *httpSSL = httpSSL_init(socketFD);
+  httpSSL = httpSSL_init(socketFD);
 
   if (!httpSSL)
     goto fail_SSL;
 
-  string_t *rawMessage = http_createRawMessageRequest(request->url);
+  rawMessage = http_createRawMessageRequest(request->url);
 
   if (http_sendRawMessage(rawMessage, httpSSL->ssl) == -1)
     goto fail_sendRawMessage;
 
-  string_t *responseString = string_init();
+  responseString = string_init();
 
   if (http_readRawResponse(httpSSL->ssl, responseString) == -1)
     goto fail_readRawResponse;
 
-  httpResponse_t *httpResponse = httpResponse_init(responseString->data);
+  httpResponse = httpResponse_init(responseString->data);
 
   debug("HTTP Response Status: %s\n", httpResponse->status);
   debug("HTTP Response Headers: \n%s\n", httpResponse->headers);
