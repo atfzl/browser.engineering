@@ -14,27 +14,31 @@
 
 static struct addrinfo *http_getIPAddressInfo(const char *hostName) {
   struct addrinfo hints;
-
-  memset(&hints, 0, sizeof(hints));
-  hints.ai_family = AF_INET; // IPv4
-  hints.ai_socktype = SOCK_STREAM;
-  hints.ai_flags = 0;
-  hints.ai_protocol = 0;
-
   struct addrinfo *addressInfoResult;
-  int addressInfoError =
-      getaddrinfo(hostName, "https", &hints, &addressInfoResult);
-  if (addressInfoError != 0) {
-    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(addressInfoError));
-    return NULL;
+  int addressInfoError = -1;
+  char ipstr[INET6_ADDRSTRLEN];
+
+  {
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET; // IPv4
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = 0;
+    hints.ai_protocol = 0;
   }
 
-  char ipstr[INET6_ADDRSTRLEN];
+  addressInfoError = getaddrinfo(hostName, "https", &hints, &addressInfoResult);
+
+  if (addressInfoError != 0)
+    goto fail_addrinfo;
+
   inet_ntop(addressInfoResult->ai_family, addressInfoResult->ai_addr, ipstr,
             sizeof ipstr);
   debug("IPv4 address for %s: %s\n", hostName, ipstr);
-
   return addressInfoResult;
+
+fail_addrinfo:
+  fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(addressInfoError));
+  return NULL;
 }
 
 static int http_getSocketFD(const struct addrinfo *addressInfo) {
@@ -158,7 +162,6 @@ httpResponse_t *http_requestHTML(const char *urlString) {
   close(socketFD);
   freeaddrinfo(addressInfo);
   httpRequest_destroy(request);
-
   return httpResponse;
 
 fail_readRawResponse:
