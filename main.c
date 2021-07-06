@@ -9,20 +9,25 @@
 int main() {
   debug_init();
 
-  httpResponse_t *httpResponse =
-      http_requestHTML("https://example.org/index.html");
+  httpResponse_t *httpResponse = NULL;
+  string_t *htmlBody = NULL;
+
+  httpResponse = http_requestHTML("https://example.org/index.html");
 
   if (!httpResponse) {
-    return EXIT_FAILURE;
+    goto fail_http_requestHTML;
   }
 
   debug("http response html: %s\n", httpResponse->html);
 
-  string_t *htmlBody = htmlShow(httpResponse->html);
+  htmlBody = htmlShow(httpResponse->html);
 
   renderHTML(htmlBody->data);
 
   httpResponse_destroy(httpResponse);
 
   return EXIT_SUCCESS;
+
+fail_http_requestHTML:
+  return EXIT_FAILURE;
 }
