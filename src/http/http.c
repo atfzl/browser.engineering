@@ -111,52 +111,60 @@ static int http_readRawResponse(SSL *ssl, string_t *responseString) {
 httpResponse_t *http_requestHTML(const char *urlString) {
   httpRequest_t *request = httpRequest_init(urlString);
 
-  if (!request) {
-    return NULL;
-  }
+  if (!request)
+    goto fail_requestInit;
 
   struct addrinfo *addressInfo = http_getIPAddressInfo(request->url->host);
 
-  if (!addressInfo) {
-    return NULL;
-  }
+  if (!addressInfo)
+    goto fail_getIPAddressInfo;
 
   int socketFD = http_getSocketFD(addressInfo);
 
-  if (socketFD == -1) {
-    return NULL;
-  }
+  if (socketFD == -1)
+    goto fail_getSocketFD;
 
   httpSSL_t *httpSSL = httpSSL_init(socketFD);
 
-  if (!httpSSL) {
-    return NULL;
-  }
+  if (!httpSSL)
+    goto fail_SSL;
 
   string_t *rawMessage = http_createRawMessageRequest(request->url);
-  if (http_sendRawMessage(rawMessage, httpSSL->ssl) == -1) {
-    return NULL;
-  }
 
-  string_destroy(rawMessage);
+  if (http_sendRawMessage(rawMessage, httpSSL->ssl) == -1)
+    goto fail_sendRawMessage;
 
   string_t *responseString = string_init();
 
-  if (http_readRawResponse(httpSSL->ssl, responseString) == -1) {
-    string_destroy(responseString);
-    return NULL;
-  }
+  if (http_readRawResponse(httpSSL->ssl, responseString) == -1)
+    goto fail_readRawResponse;
 
   httpResponse_t *httpResponse = httpResponse_init(responseString->data);
-  string_destroy(responseString);
 
   debug("HTTP Response Status: %s\n", httpResponse->status);
   debug("HTTP Response Headers: \n%s\n", httpResponse->headers);
 
-  freeaddrinfo(addressInfo);
-  httpRequest_destroy(request);
+  string_destroy(responseString);
+  string_destroy(rawMessage);
   httpSSL_destroy(httpSSL);
   close(socketFD);
+  freeaddrinfo(addressInfo);
+  httpRequest_destroy(request);
 
   return httpResponse;
+
+fail_readRawResponse:
+  string_destroy(responseString);
+fail_sendRawMessage:
+  string_destroy(rawMessage);
+fail_SSL:
+  httpSSL_destroy(httpSSL);
+fail_getSocketFD:
+  close(socketFD);
+fail_getIPAddressInfo:
+  freeaddrinfo(addressInfo);
+fail_requestInit:
+  httpRequest_destroy(request);
+
+  return NULL;
 }
