@@ -29,7 +29,6 @@ httpSSL_t *httpSSL_init(int socketFD) {
   status = SSL_connect(httpSSL->ssl);
   if (status != 1) {
     SSL_get_error(httpSSL->ssl, status);
-    ERR_print_errors_fp(stderr); // High probability this doesn't do anything
     fprintf(stderr, "SSL_connect failed with SSL_get_error code %d\n", status);
     goto fail_SSL_connect;
   }
