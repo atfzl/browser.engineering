@@ -86,7 +86,7 @@ static string_t *http_createRawMessageRequest(url_t *url) {
   return message;
 }
 
-static int http_sendRawMessage(string_t *message, SSL *ssl) {
+static int http_sendRawMessage(SSL *ssl, string_t *message) {
   debug("%s\n", "Sending message");
   if ((size_t)SSL_write(ssl, message->data, (int)(message->length)) !=
       message->length) {
@@ -158,7 +158,7 @@ httpResponse_t *http_requestHTML(const char *urlString) {
 
   rawMessage = http_createRawMessageRequest(request->url);
 
-  if (http_sendRawMessage(rawMessage, httpSSL->ssl) == -1)
+  if (http_sendRawMessage(httpSSL->ssl, rawMessage) == -1)
     goto fail_sendRawMessage;
 
   responseString = string_init();
