@@ -10,7 +10,7 @@ int main() {
   debug_init();
 
   httpResponse_t *httpResponse = NULL;
-  string_t *htmlBody = NULL;
+  string_t *htmlWithoutTags = NULL;
 
   httpResponse = http_requestHTML("https://example.org/index.html");
 
@@ -20,9 +20,9 @@ int main() {
 
   debug("http response html: %s\n", httpResponse->html);
 
-  htmlBody = htmlShow(httpResponse->html);
+  htmlWithoutTags = htmlShow(httpResponse->html);
 
-  renderHTML(htmlBody->data);
+  renderHTML(htmlWithoutTags->data);
 
   httpResponse_destroy(httpResponse);
 
