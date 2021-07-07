@@ -72,15 +72,15 @@ fail_connect:
   return -1;
 }
 
-static string_t *http_createRawMessageRequest(url_t *url) {
+static string_t *http_createRawMessageRequest(httpRequest_t *request) {
   string_t *message = NULL;
 
   message = string_init();
   string_concat(message, "GET ");
-  string_concat(message, url->path);
+  string_concat(message, request->url->path);
   string_concat(message, " HTTP/1.0\r\n");
   string_concat(message, "Host: ");
-  string_concat(message, url->host);
+  string_concat(message, request->url->host);
   string_concat(message, "\r\n\r\n");
 
   return message;
@@ -156,7 +156,7 @@ httpResponse_t *http_requestHTML(const char *urlString) {
   if (!httpSSL)
     goto fail_SSL;
 
-  rawMessage = http_createRawMessageRequest(request->url);
+  rawMessage = http_createRawMessageRequest(request);
 
   if (http_sendRawMessage(httpSSL->ssl, rawMessage) == -1)
     goto fail_sendRawMessage;
