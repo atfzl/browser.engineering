@@ -189,13 +189,13 @@ fail_readRawResponse:
   string_destroy(responseString);
 fail_sendRawMessage:
   string_destroy(rawMessage);
-fail_SSL:
   httpSSL_destroy(httpSSL);
-fail_getSocketFD:
+fail_SSL:
   close(socketFD);
-fail_getIPAddressInfo:
+fail_getSocketFD:
   freeaddrinfo(addressInfo);
-fail_requestInit:
+fail_getIPAddressInfo:
   httpRequest_destroy(request);
+fail_requestInit:
   return NULL;
 }
