@@ -138,33 +138,39 @@ httpResponse_t *http_requestHTML(const char *urlString) {
 
   request = httpRequest_init(urlString);
 
-  if (!request)
+  if (!request) {
     goto fail_requestInit;
+  }
 
   addressInfo = http_getIPAddressInfo(request->url->host);
 
-  if (!addressInfo)
+  if (!addressInfo) {
     goto fail_getIPAddressInfo;
+  }
 
   socketFD = http_getSocketFD(addressInfo);
 
-  if (socketFD == -1)
+  if (socketFD == -1) {
     goto fail_getSocketFD;
+  }
 
   httpSSL = httpSSL_init(socketFD);
 
-  if (!httpSSL)
+  if (!httpSSL) {
     goto fail_SSL;
+  }
 
   rawMessage = http_createRawMessageRequest(request);
 
-  if (http_sendRawMessage(httpSSL->ssl, rawMessage) == -1)
+  if (http_sendRawMessage(httpSSL->ssl, rawMessage) == -1) {
     goto fail_sendRawMessage;
+  }
 
   responseString = string_init();
 
-  if (http_readRawResponse(httpSSL->ssl, responseString) == -1)
+  if (http_readRawResponse(httpSSL->ssl, responseString) == -1) {
     goto fail_readRawResponse;
+  }
 
   httpResponse = httpResponse_init(responseString->data);
 
