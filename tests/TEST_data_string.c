@@ -6,7 +6,7 @@
 #include <cmocka.h>
 // clang-format on
 
-#include "../src/data/string.h"
+#include "../src/ds/string.h"
 #include <string.h>
 
 static void TEST_string_push() {

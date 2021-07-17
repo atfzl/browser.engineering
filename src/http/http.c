@@ -1,6 +1,6 @@
 #include "./http.h"
-#include "../data/string.h"
 #include "../debug.h"
+#include "../ds/string.h"
 #include "./httpRequest.h"
 #include "./httpResponse.h"
 #include "./httpSSL.h"
